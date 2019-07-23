@@ -1,0 +1,10 @@
+@font-face {
+	font-family: 'MedievalSharp';
+	src: url('https://fonts.googleapis.com/css?family=MedievalSharp&display=swap');
+}
+
+.MedievalSharp{
+	font-family: 'MedievalSharp';
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}

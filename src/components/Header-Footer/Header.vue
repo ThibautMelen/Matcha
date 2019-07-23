@@ -3,7 +3,14 @@
         <header>
 
             <nav class="navbar-login-register text-align-center blanche blackpearl-bg">
-                <img class="logo-nav-matcha" alt="Matcha Logo" src="../../assets/matcha_logo.png">
+				<router-link to="/">
+                	<img class="logo-nav-matcha" alt="Matcha Logo" src="../../assets/matcha_logo.png">
+				</router-link>
+
+				<div class="navbar-float-menu-rigth register-login h-inherit absolute inline-flex right-0 top-0">
+                   <router-link tag="div" to="/login" class="flex-center-middle blanche h-100"><p>LOGIN</p></router-link>
+                   <router-link tag="div" to="/register" class="flex-center-middle blanche h-100"><p>REGISTER</p></router-link>
+                </div>
 
             </nav>
             
@@ -26,13 +33,13 @@
 
 <style type="text/css">
 
-/*****************************************************************
+/****************************************************************
 	NAVBAR
 *****************************************************************/
 
 nav{
 	width: 100vw;
-	height: 75px;
+	height: 70px;
 	position: fixed;
 	top: 0px;
 	right: 0px;
@@ -139,7 +146,7 @@ nav{
 
 /**** LOGO ****/
 .logo-nav-matcha {
-    margin-top: 16px;
+    margin-top: 14px;
     width: 140px;
 }
 
@@ -147,14 +154,18 @@ nav{
 .register-login div{
 	cursor: pointer;
 	min-width: 150px;
+	background: #088b8c;
+}
+.register-login div:nth-child(2){
+	background: #f5836a;
 }
 
 .register-login p{
-	font-size: 11.5px;
+	font-size: 16px;
 	letter-spacing: 0.15px;
 	word-spacing: .5px;
 	transition: .2s;
-	margin: 0 30px;
+	margin: 8px 30px 0 30px
 }
 
 /*****************************************************************
