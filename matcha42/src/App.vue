@@ -22,6 +22,7 @@ export default {
 </script>
 
 <style>
+  @import './css/animation.css';
   @import './css/colors.css';
   @import './css/font.css';
   @import './css/global.css';
