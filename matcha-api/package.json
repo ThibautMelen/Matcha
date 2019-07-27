@@ -1,0 +1,17 @@
+{
+  "name": "matcha-api",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "thmelen",
+  "license": "MIT",
+  "scripts": {
+    "dev": "yarn nodemon server/server.js -w server"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "mysql": "^2.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^1.19.1"
+  }
+}
