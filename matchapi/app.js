@@ -12,6 +12,13 @@ const db = mysql.createConnection({
     insecureAuth: true
 });
 
+// const db = mysql.createConnection({
+//     host     : 'localhost',
+//     user     : 'root',
+//     password : '123456',
+//     database : 'nodemysql'
+// });
+
 // Connect
 db.connect((err) => {
     if(err){
