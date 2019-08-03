@@ -71,22 +71,30 @@ export default {
         },
 
         //TEST FETCH
-        fetchUsers () {
+        async fetchUsers () {
             console.log(`mdrrr`);
-            const baseURI = '/user/getusers'
-            this.$api.get(baseURI, {
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                    'Content-Type': 'application/json'
-                }})
-                .then((response) => {    
-                    console.log(response)    
-                    this.users = response.data; 
-                })    
-                .catch((errors) => {    
-                    console.log(errors);
-                })
+            const baseURI = '/user/all?salut=coucou';
+            
+            try {
+                const res = await this.$api.get(baseURI, { salut: 'coucou' });
+                this.users = res.data;
+            } catch (ex) {
+                console.log(ex);
+            }
         }
+
+        // async fetchUsers () {
+        //     console.log(`mdrrr`);
+        //     const baseURI = '/user/2'
+            
+        //     try {
+        //         const res = await this.$api.get(baseURI);
+        //         console.log(res.data)
+        //         this.users = [ res.data ];
+        //     } catch (ex) {
+        //         console.log(ex)
+        //     }
+        // }
     }
 }
 </script>
