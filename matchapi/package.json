@@ -4,7 +4,8 @@
   "description": "Sample app for using mysql with node",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "yarn nodemon server/server.js -w app"
   },
   "author": "thmelen",
   "license": "ISC",

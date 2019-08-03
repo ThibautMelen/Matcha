@@ -1,8 +1,7 @@
 <template>
     <section class="flex">
         <section class="form-register-login-container thor w-100 ubuntu-regular flex-center-middle h-100 fixed bottom-0 right-0">
-
-            <form @submit.prevent="login" class="MedievalSharp form-register-login form-register-login-responsive relative border-radius-12 blanche-bg">
+            <form @submit.prevent="onSubmit" class="MedievalSharp form-register-login form-register-login-responsive relative border-radius-12 blanche-bg">
                 
                 <h2 class="margin-0 fennir x">Bon retour sur Matcha</h2>
                 
@@ -14,15 +13,17 @@
                 </ul>
              
                 <div class="input-group">      
-                    <input v-model="formdata.username" type="text" class="MedievalSharp" required>
+                    <!-- <input v-model="formdata.username" type="text" class="MedievalSharp" required> -->
+                    <input name="username" type="text" class="MedievalSharp" required>
 
                     <span class="highlight"></span>
                     <span class="bar"></span>
-                    <label>Username</label>
+                    <label>Usernme</label>
                 </div>
                 
                 <div class="input-group">      
-                    <input v-model="formdata.password" type="password" class="MedievalSharp" required>
+                    <!-- <input v-model="formdata.password" type="password" class="MedievalSharp" required> -->
+                    <input name="password" type="password" class="MedievalSharp" required>
                     <span class="highlight"></span>
                     <span c lass="bar"></span>
                     <label>Password</label>
@@ -33,7 +34,6 @@
                 </div>
 
             </form>
-
         </section>
     </section>
 </template>
@@ -53,22 +53,22 @@ export default {
         }
     },
     methods:{
-        login(){    
-            // console.log(this.formdata);
-            let data = {    
-                email: this.formdata.username,    
-                password: this.formdata.password    
-            }    
-            console.log(data)
-            axios.post('/adduser1');
-            // axios.post("/api/login", data)    
-            //     .then((response) => {    
-            //         console.log("Logged in")    
-            //         router.push("/dashboard")    
-            //     })    
-            //     .catch((errors) => {    
-            //         console.log("Cannot log in")    
-            //     })  
+
+        //LOGIN FUNCTION
+        onSubmit(){
+            console.log(this.formdata)
+        },
+        login() {
+            if(this.input.username != "" && this.input.password != "") {
+                if(this.input.username == this.$parent.mockAccount.username && this.input.password == this.$parent.mockAccount.password) {
+                    this.$emit("authenticated", true);
+                    this.$router.replace({ name: "secure" });
+                } else {
+                    console.log("The username and / or password is incorrect");
+                }
+            } else {
+                console.log("A username and password must be present");
+            }
         },
 
         //TEST FETCH
