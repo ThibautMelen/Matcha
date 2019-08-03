@@ -72,7 +72,8 @@ export default {
 
         //TEST FETCH
         fetchUsers () {
-            const baseURI = '/getusers'
+            console.log(`mdrrr`);
+            const baseURI = '/user/getusers'
             this.$api.get(baseURI, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
