@@ -9,7 +9,7 @@
                 <ul>
                     <p @click="fetchUsers">FETCH</p>
                     <li v-for="user in users" :key="user.id">
-                        {{ user.name }}
+                        {{ user.pseudo }}
                     </li>
                 </ul>
              
@@ -39,7 +39,6 @@
 </template>
 
 <script>
-import axios from "axios";
 
 export default {
     name: "Login",
@@ -73,16 +72,19 @@ export default {
 
         //TEST FETCH
         fetchUsers () {
-            const baseURI = 'https://jsonplaceholder.typicode.com/users'
-            axios.get(baseURI, {
+            const baseURI = '/getusers'
+            this.$api.get(baseURI, {
                 headers: {
                     'Access-Control-Allow-Origin': '*',
                     'Content-Type': 'application/json'
                 }})
-            .then((result) => {
-                this.users = result.data;
-                console.log(result.data);
-            })
+                .then((response) => {    
+                    console.log(response)    
+                    this.users = response.data; 
+                })    
+                .catch((errors) => {    
+                    console.log(errors);
+                })
         }
     }
 }
