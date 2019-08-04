@@ -2,12 +2,12 @@
     <section class="flex">
         <section class="form-register-login-container thor w-100 ubuntu-regular flex-center-middle h-100 fixed bottom-0 right-0">
 
-            <form @submit.prevent="login" class="MedievalSharp form-register-login form-register-login-responsive relative border-radius-12 blanche-bg">
+            <form @submit.prevent="login()" class="MedievalSharp form-register-login form-register-login-responsive relative border-radius-12 blanche-bg">
                 
                 <h2 class="margin-0 fennir x">Bon retour sur Matcha</h2>
                 
                 <ul>
-                    <p @click="fetchUsers">FETCH</p>
+                    <p @click="fetchUsers">FEDSDTCH</p>
                     <li v-for="user in users" :key="user.id">
                         {{ user.pseudo }}
                     </li>
@@ -52,25 +52,22 @@ export default {
         }
     },
     methods:{
-        login(){    
-            // console.log(this.formdata);
+        async login () {
             let data = {    
-                email: this.formdata.username,    
+                username: this.formdata.username,    
                 password: this.formdata.password    
-            }    
-            console.log(data)
-            axios.post('/adduser1');
-            // axios.post("/api/login", data)    
-            //     .then((response) => {    
-            //         console.log("Logged in")    
-            //         router.push("/dashboard")    
-            //     })    
-            //     .catch((errors) => {    
-            //         console.log("Cannot log in")    
-            //     })  
+            }
+            
+            const baseURI = '/auth/login';
+            try {
+                const res = await this.$api.post(baseURI, { username : data.username, password : data.password });
+                this.users = res.data;
+            } catch (ex) {
+                console.log(ex);
+            }
         },
 
-        //TEST FETCH
+        // FETCH ALL USER
         async fetchUsers () {
             console.log(`mdrrr`);
             const baseURI = '/user/all?salut=coucou';
@@ -83,6 +80,7 @@ export default {
             }
         }
 
+        // FETCH ONE SINGLE USER
         // async fetchUsers () {
         //     console.log(`mdrrr`);
         //     const baseURI = '/user/2'
