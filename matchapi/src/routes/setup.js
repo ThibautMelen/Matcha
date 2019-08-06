@@ -36,18 +36,5 @@ module.exports = () => {
         });
     });
 
-
-// // Add user 1
-// app.get('/adduser1', (req, res) => {
-//     let post = {pseudo:'Jean', email:'jean@matcha.com', pass:'123456', avatar:'oklm', notif: 1, mail_key:'oklm', confirm: 1};
-//     let sql = "INSERT INTO users SET ?";
-//     let query = db.query(sql, post, (err, results) => {
-//         if(err) throw err;
-//         console.log(results);
-//         res.send('User 1 added...');
-//     });
-// });
-
-
     return router;
 }

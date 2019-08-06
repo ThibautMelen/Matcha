@@ -68,9 +68,8 @@ export default {
     },
     methods:{
         async register () {
-            console.log(`tamere`);
-            let data = {    
-                username: this.formdata.username,    
+            let data = {
+                username: this.formdata.username,
                 password: this.formdata.password,
                 email: this.formdata.email,
                 first_name: this.formdata.first_name,
@@ -79,8 +78,6 @@ export default {
             console.log(data);
             const baseURI = '/auth/register';
             try {
-                console.log(`tamere2`);
-
                 const res = await this.$api.post(baseURI, {
                     username : data.username,
                     password : data.password,

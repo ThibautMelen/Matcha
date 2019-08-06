@@ -5,6 +5,7 @@ const cors = require('cors');
 const parser = require('body-parser');
 const mysql = require('mysql');
 
+
 const setupRouter = require('./routes/setup');
 const authRouter = require('./routes/auth');
 const userRouter = require('./routes/user');
@@ -26,11 +27,11 @@ module.exports = class Server {
         this.app.use((req, res, next) => {
             req.db = this.db;
             next();
-        })
+        });
 
         this.db = mysql.createConnection({
             host     : 'localhost',
-            port: 3306,
+            port     :  3306,
             user     : 'root',
             password : 'your_current_password',
             database : 'matchadb'
