@@ -57,11 +57,13 @@ export default {
                 username: this.formdata.username,    
                 password: this.formdata.password    
             }
-            
             const baseURI = '/auth/login';
             try {
-                const res = await this.$api.post(baseURI, { username : data.username, password : data.password });
-                this.users = res.data;
+                const res = await this.$api.post(baseURI, {
+                    username : data.username,
+                    password : data.password
+                });
+                console.log(res.data);
             } catch (ex) {
                 console.log(ex);
             }

@@ -24,8 +24,8 @@ module.exports = () => {
 
     // Update User
     router.put('/up/:id/:new', (req, res) => {
-        let sql = `UPDATE users SET username = ? WHERE id = ?`;
-        let inserts = [ req.params.new, req.params.id];
+        let sql = "UPDATE users SET username = ? WHERE id = ?";
+        let inserts = [req.params.new, req.params.id];
 
         req.db.query(sql, inserts, (err, results) => {
             if(err) return res.status(500).send("FAIL : UP user");
@@ -67,4 +67,4 @@ module.exports = () => {
     })
 
     return router;
-}
+};

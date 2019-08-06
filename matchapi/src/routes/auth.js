@@ -6,87 +6,73 @@ module.exports = () => {
 
     router.post('/login', async (req, res) => {
 
-        console.log(`A`);
-
-        // Verif Login Schema
         const schema_login = Joi.object({
             username: Joi.string().trim().min(4).max(25).required(),
             password: Joi.string().trim().regex(/^[a-zA-Z0-9]{8,}$/).required()
         }).options({ stripUnknown: true, abortEarly: false });
 
-        console.log(`B`);
-
-        // Verif data
         try {
             const body = await schema_login.validate(req.body);
 
-            console.log(`C`);
+            let sql = "SELECT * FROM users WHERE username = ? AND pass = ?";
+            let inserts = [body.username, body.password];
 
-            //User exist ?
-            // let sql = "SELECT * FROM users WHERE pseudo = ?? AND pass = ??";
-            // // let inserts = [req.username, req.password];
-            // // sql = mysql.format(sql, inserts);
-            // // console.log(sql);
-            
-    
-            console.log(`D`);
-    
+            req.db.query(sql, inserts, (err, results) => {
+                if (err) return res.status(500).send("FAIL : Auth Login user");
+                else if (results != ""){
+                    
+                    //ENVOYER L'INFO QUE LA CO A SUCCESS
+                    ////////////////////////////////////
+                    console.log(`${results[0].username} + ${results[0].pass}`);
+                    return res.json(results[0]);
+                    ///////////////////////////////////
+                    //////////////////////////////////
+                }
+                return res.status(500).send("FAIL : User Not Found");
+            });
 
-            
-            return res.json(body);
+            // return res.json(body);
         } catch (ex) {
             if (ex.name === 'ValidationError')
                 return res.status(400).json(ex);
         }
 
-
-        // $requser = $bdd->prepare("SELECT * FROM member WHERE pseudo = ? AND pass = ?");
-        // $requser->execute(array($login_pseudo, $login_password));
-        // $userexist = $requser->rowCount();
-        // if($userexist == 1) {
-        //     $userinfo = $requser->fetch();
-        //     if($userinfo['confirm'] == 1) {
-        //         $_SESSION['id'] = $userinfo['id'];
-        //         $_SESSION['pseudo'] = $userinfo['pseudo'];
-        //         $_SESSION['email'] = $userinfo['email'];
-        //         $_SESSION['avatar'] = $userinfo['avatar'];
-        //         $_SESSION['notif'] = $userinfo['notif'];
-        //         header('Location: ../index.php');
-        //     }
-        //     else{
-        //         $login_error = "Compte non comfirmée par mail";
-        //     }
-        // }
-        // else
-        //     $login_error = "Mauvais pseudo ou mot de passe !";
-
-
-
-        // //get data / verif
-        // let username = req.body.username.trim();
-        // let password = req.body.password.trim();
-        // if(username == 'aa') // if (!username || !password)
-        // {
-        //     console.log('nop');
-        //     res.status(400).json({
-        //         error: 'Information is missing in request.'
-        //     });
-        // }
-
-        // console.log(`"${username}" + "${password}"`);
-
-
-        // //get name
-	    // // let db_username = await Users.findOne({$or: [{email: name.toLowerCase()}, {username: name}]});
-	    // // if (!db_username)
-        // //     res.status(203, 'db_username not found');
-
-
     });
 
-    router.get('/register', (req, res) => {
-        res.send('bonjour');
+    router.post('/register', async (req, res) => {
+        const schema_register = Joi.object({
+            username: Joi.string().trim().min(4).max(25).required(),
+            password: Joi.string().trim().regex(/^[a-zA-Z0-9]{8,}$/).required(),
+            email: Joi.string().trim().regex(/^[^\W][a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)*\@[a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)*\.[a-zA-Z]{2,4}$/).required(),
+            first_name: Joi.string().trim().required(),
+            last_name: Joi.string().trim().required()
+        }).options({ stripUnknown: true, abortEarly: false });
+
+        try {
+            const body = await schema_register.validate(req.body);
+
+            let sql = "INSERT INTO users SET ?";
+            let inserts = {
+                username: body.username,
+                pass: body.password,
+                email: body.email,
+                first_name: body.first_name,
+                last_name: body.last_name,
+                mail_key: 'jtebaiz',
+                confirm: 1
+            };
+
+            console.log(inserts);
+
+            req.db.query(sql, inserts, (err, results) => {
+                if(err) return res.status(500).send("FAIL : Add user");
+                res.json(`${inserts.username} is added`);
+            });
+        } catch (ex) {
+            if (ex.name === 'ValidationError')
+                return res.status(400).json(ex);
+        }
     });
 
     return router;
-}
+};
