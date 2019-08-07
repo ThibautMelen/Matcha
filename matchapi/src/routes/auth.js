@@ -14,62 +14,39 @@ module.exports = () => {
             password: Joi.string().trim().regex(/^[a-zA-Z0-9]{8,}$/).required()
         }).options({ stripUnknown: true, abortEarly: false });
 
-        console.log(`${`tamer`} + ${req.body.password}`);
-
-        // res.json(`salut`);
-
-        // bcrypt.compare(req.body.password, `$2b$10$IaOdVq65KVW4FbkrmYjzFOVQXQSIexrxJEAOqfD4045SFdwaoTMn2`, function(err, results) {
-        //     if(results) {
-        //         console.log(`Les mots de pass corresponde`);
-        //         res.send(`yes !`);
-        //     } else {
-        //         console.log(`Ceci ne fonctionne pas. Ton mot de passe n'est pas le bon tres cher`);
-        //         res.send(`nop`);
-        //     } 
-        // });
-
-
         try {
-            console.log(`A`);
             const body = await schema_login.validate(req.body);
 
             let sql = "SELECT pass FROM users WHERE username = ?";
             let inserts = body.username;
 
-            console.log(`B`);
+            
 
-            req.db.query(sql, inserts, (err, results) => {
+            let data = req.db.query(sql, inserts, (err, results) => {
                 if (err) return res.status(500).send("FAIL : Auth Login user");
                 else if (results != ""){
-                    
-                    //ENVOYER L'INFO QUE LA CO A SUCCESS
-                    ////////////////////////////////////
-                    console.log(`${results[0].username} + ${results[0].pass}`);
-                    return res.json(results[0]);
-                    ///////////////////////////////////
-                    //////////////////////////////////
+
+                    //Password hash
+                    console.log(`${req.body.password} + ${results[0].pass}`);
+                    const res_qq = await bcrypt.compare(req.body.password, results[0].pass);
+
+                    if(res_qq) {
+                        console.log(`Les mots de pass corresponde`);
+                        // res.json(`Les mots de pass corresponde`);
+                        return res.status(200).send("FAIL : User Found");
+                    } else {
+                        console.log(`Ceci ne fonctionne pas. Ton mot de passe n'est pas le bon tres cher`);
+                        return res.json(`Ceci ne fonctionne pas. Ton mot de passe n'est pas le bon tres cher`);
+                    } 
                 }
-                return res.status(500).send("FAIL : User Not Found");
+                else
+                    return res.status(500).send("FAIL : User Not Found");
             });
 
-            // const body = await schema_login.validate(req.body);
+            if(!data)
+                return res.status(500).send("FAILSS");
 
-            // let sql = "SELECT * FROM users WHERE username = ? AND pass = ?";
-            // let inserts = [body.username, body.password];
 
-            // req.db.query(sql, inserts, (err, results) => {
-            //     if (err) return res.status(500).send("FAIL : Auth Login user");
-            //     else if (results != ""){
-                    
-            //         //ENVOYER L'INFO QUE LA CO A SUCCESS
-            //         ////////////////////////////////////
-            //         console.log(`${results[0].username} + ${results[0].pass}`);
-            //         return res.json(results[0]);
-            //         ///////////////////////////////////
-            //         //////////////////////////////////
-            //     }
-            //     return res.status(500).send("FAIL : User Not Found");
-            // });
 
             // return res.json(body);
         } catch (ex) {
@@ -91,11 +68,9 @@ module.exports = () => {
         try {
             const body = await schema_register.validate(req.body);
 
-
             let sql = "INSERT INTO users SET ?";
             let inserts = {
                 username: body.username,
-                // pass: body.password,
                 pass : await bcrypt.hash(body.password, saltRounds),
                 email: body.email,
                 first_name: body.first_name,
@@ -103,10 +78,6 @@ module.exports = () => {
                 mail_key: 'jtebaiz',
                 confirm: 1
             };
-
-            console.log(`${inserts.pass} + ${body.password}`);
-
-            console.log(inserts);
 
             req.db.query(sql, inserts, (err, results) => {
                 if(err) return res.status(500).send("FAIL : Add user");
