@@ -3,28 +3,23 @@
 
     <section id="match">
 
-<vue-swing
-  @throwout="throwout"
-  @throwin="throwin"
-  :config="config"
+<Vue2InteractDraggable
+  @draggedLeft="draggedLeft"
+  :interact-event-bus-events="interactEventBusEvents"
+  v-if="isShowing"
+  class="card isCurrent"
 >
-  <div class="box">Toss me! Don't tell the elf!</div>
-</vue-swing>
+  <div>
+    <h3 class="cardTitle">Drag me!</h3>
+  </div>
+</Vue2InteractDraggable>
 
 
-        <div id="presentation">
+        <!-- <div id="presentation">
             <div class="buddy">
                 <div class="avatar" style="display: block; background-image: url(http://static.stylemagazin.hu/medias/29280/Nem-ehezik-a-Women-of-the-Year-legjobb-modell-dijara-eselyes-szepseg_32fc7c86954a8847610499a0fc7261e2.jpg)"></div>
-                <!-- <img src="https://s3.eu-west-3.amazonaws.com/pikomit/users/5b93235366cf193a01a12957/8E3vAF7dYUOnYlqH0itKjPhNlH4QPQ1565128107465_400px.jpg" alt=""> -->
-                <!-- <h1>La Home MGL {{ famille }}</h1> -->
             </div>
-
-            <div class="buddy">
-                <div class="avatar" style="display: block; background-image: url(http://w1nd.cc/promo/347.jpg)"></div>
-            </div>
-
-
-        </div>
+        </div> -->
         <!-- <div id="valid">
             <input type="submit" value="NOP">
             <input type="submit" value="LIKE">
@@ -38,24 +33,28 @@
 
 <script>
 import Vue from 'vue'
-import VueSwing from 'vue-swing';
+import { Vue2InteractDraggable, InteractEventBus } from 'vue2-interact'
+ 
+const INTERACT_DRAGGED_LEFT = 'INTERACT_DRAGGED_LEFT';
 
-Vue.component('vue-swing', VueSwing);
 export default {
     name: "Home",
     data(){
         return {
-            config: {
-                minThrowOutDistance: 100,
-                // Determine the rotation of the element
-                maxRotation: 80
-            },
             home: true,
-            aaa: "aa"
+            isShowing: true,
+            interactEventBusEvents: {
+                draggedLeft: INTERACT_DRAGGED_LEFT,
+            },
         }
     },
+    components: {
+        Vue2InteractDraggable
+    },
     methods:{
-
+        dragLeft() {
+            InteractEventBus.$emit(INTERACT_DRAGGED_LEFT);
+        },
     },
     mounted(){
 
