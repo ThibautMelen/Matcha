@@ -1,19 +1,26 @@
 <template>
 <div>
-
     <section id="match">
-
-<Vue2InteractDraggable
-  @draggedLeft="draggedLeft"
-  :interact-event-bus-events="interactEventBusEvents"
-  v-if="isShowing"
-  class="card isCurrent"
->
-  <div>
-    <h3 class="cardTitle">Drag me!</h3>
-  </div>
-</Vue2InteractDraggable>
-
+        
+        <div class="container-swipe">
+            <Vue2InteractDraggable
+                @draggedDown="draggedDown"
+                @draggedLeft="draggedLeft"
+                @draggedRight="draggedRight"
+                @draggedUp="draggedUp"
+                :interact-max-rotation="15"
+                :interact-out-of-sight-x-coordinate="500"
+                :interact-x-threshold="200"
+                :interact-event-bus-events="interactEventBusEvents"
+                v-if="isShowing"
+                class="card isCurrent"
+                v-bind:style="{ backgroundImage: 'url(/static/margot-robbie.jpg)' }"
+                >
+                
+    
+            </Vue2InteractDraggable>
+        
+        </div>
 
         <!-- <div id="presentation">
             <div class="buddy">
@@ -32,29 +39,75 @@
 
 
 <script>
-import Vue from 'vue'
-import { Vue2InteractDraggable, InteractEventBus } from 'vue2-interact'
- 
-const INTERACT_DRAGGED_LEFT = 'INTERACT_DRAGGED_LEFT';
+import { Vue2InteractDraggable, InteractEventBus } from "vue2-interact";
+
+const INTERACT_DRAGGED_DOWN = "INTERACT_DRAGGED_DOWN";
+const INTERACT_DRAGGED_LEFT = "INTERACT_DRAGGED_LEFT";
+const INTERACT_DRAGGED_RIGHT = "INTERACT_DRAGGED_RIGHT";
+const INTERACT_DRAGGED_UP = "INTERACT_DRAGGED_UP";
 
 export default {
     name: "Home",
-    data(){
+    data () {
         return {
-            home: true,
             isShowing: true,
             interactEventBusEvents: {
+                draggedDown: INTERACT_DRAGGED_DOWN,
                 draggedLeft: INTERACT_DRAGGED_LEFT,
-            },
+                draggedRight: INTERACT_DRAGGED_RIGHT,
+                draggedUp: INTERACT_DRAGGED_UP
+            }
         }
     },
     components: {
-        Vue2InteractDraggable
+        Vue2InteractDraggable,
     },
+
     methods:{
-        dragLeft() {
-            InteractEventBus.$emit(INTERACT_DRAGGED_LEFT);
+        draggedDown() {
+          console.log("dragged down!");
+          this.hideCard();
         },
+
+        draggedLeft() {
+          console.log("dragged left!");
+          this.hideCard();
+        },
+
+        draggedRight() {
+          console.log("dragged right!");
+          this.hideCard();
+        },
+
+        draggedUp() {
+          console.log("dragged up!");
+          this.hideCard();
+        },
+
+        hideCard() {
+          setTimeout(() => {
+            this.isShowing = false;
+          }, 200);
+          setTimeout(() => {
+            this.isShowing = true;
+          }, 1000);
+        },
+
+        dragDown() {
+          InteractEventBus.$emit(INTERACT_DRAGGED_DOWN);
+        },
+
+        dragLeft() {
+          InteractEventBus.$emit(INTERACT_DRAGGED_LEFT);
+        },
+
+        dragRight() {
+          InteractEventBus.$emit(INTERACT_DRAGGED_RIGHT);
+        },
+
+        dragUp() {
+          InteractEventBus.$emit(INTERACT_DRAGGED_UP);
+        }
     },
     mounted(){
 
@@ -63,20 +116,35 @@ export default {
 
 </script>
 
-<script>
-    console.log(`Salut`)
-</script>
-
-
-
 <style type="text/css">
-.box {
-  border: 2px solid;
-  border-radius: 25px;
-  color: purple;
-  width: 120px;
+
+.container-swipe{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-/* @import '../../css/swaptinder.css'; */
+
+.container-swipe .card{
+    height: 480px;
+    width: 462px;
+    background: #fff;
+    border: 20px solid #fff;
+    border-radius: 10px;
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    box-shadow: 0px 0px 19px -4px rgba(111, 111, 111, 0.75);
+}
 
 section#match {
     display: flex;
