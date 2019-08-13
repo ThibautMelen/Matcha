@@ -25,6 +25,9 @@ module.exports = () => {
                     "`email` varchar(255) NOT NULL," +
                     "`first_name` varchar(255) NOT NULL," + 
                     "`last_name` varchar(255) NOT NULL," + 
+                    "`bio` varchar(255) NOT NULL," + 
+                    "`type` varchar(255) NOT NULL," + 
+                    "`age` int(11) NOT NULL," +
                     "`mail_key` varchar(32) NOT NULL," + 
                     "`confirm` int(11) NOT NULL" +
                     ") ENGINE=InnoDB DEFAULT CHARSET=utf8";

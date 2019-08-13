@@ -1,0 +1,149 @@
+/*****************************************************************
+	SECTION
+*****************************************************************/
+section#sect {
+    padding: 4% 20%;
+}
+
+section#sect h1 {
+    font-size: 25px;
+    text-transform: uppercase;
+    white-space:nowrap;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+/*****************************************************************
+	FORM STYLE
+*****************************************************************/
+section form{
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* INPUT ======================================= */
+.input-group { 
+	position:relative; 
+	margin-top:45px;
+}
+section form input, section form select{
+	font-size: 20px;
+	display:block;
+	border:none;
+	border-bottom:1px solid #f5836a;
+    width: 100%;
+    border-radius: 10px;
+    padding: 20px 0px 20px 20px;
+}
+section form input[type="submit"]{
+    cursor: pointer;
+    background-color: #01a3a4;
+    color: #fff;
+}
+section form input:focus { outline:none; }
+
+/* LABEL ======================================= */
+label 				 {
+	color:#999; 
+	font-size:20px;
+	font-weight:normal;
+	position:absolute;
+	pointer-events:none;
+	left:25px;
+	top:20px;
+	transition:0.2s ease all; 
+	-moz-transition:0.2s ease all; 
+	-webkit-transition:0.2s ease all;
+}
+
+/* active state */
+input:focus ~ label, input:valid ~ label 		{
+    top:-30px;
+    left:5px;
+	font-size:17px;
+	color:#088b8c;
+}
+
+
+/* BOTTOM BARS ================================= */
+.bar {
+    margin-left: 5px;
+    position:relative;
+    display:block;
+    width:101%;
+}
+.bar:before, .bar:after 	{
+	content:'';
+	height:5px; 
+	width:0;
+	bottom:1px; 
+	position:absolute;
+    background:#f5836a; 
+    border-radius: 25px;
+	transition:0.2s ease all; 
+	-moz-transition:0.2s ease all; 
+	-webkit-transition:0.2s ease all;
+}
+
+/* active state */
+input:focus ~ .bar:before, input:focus ~ .bar:after {
+	width:100%;
+}
+
+
+/* HIGHLIGHTER ================================== */
+.highlight {
+	position:absolute;
+	height:60%; 
+	width:100px; 
+	top:25%; 
+	left:0;
+	pointer-events:none;
+	opacity:0.5;
+}
+
+/* active state */
+input:focus ~ .highlight {
+	-webkit-animation:inputHighlighter 0.3s ease;
+	-moz-animation:inputHighlighter 0.3s ease;
+	animation:inputHighlighter 0.3s ease;
+}
+
+/*****************************************************************
+	SETTING FILE
+*****************************************************************/
+section form select {
+    height: 55px;
+}
+
+nput[type="file"] {
+    color: transparent;
+    padding: 0;
+    margin-bottom: 0;
+    padding-right: 4em;
+}
+input[type="file"]::-webkit-file-upload-button {
+    visibility: hidden;
+}
+input[type="file"]::before {
+    content: 'Select your avatar';
+    color: #424242;
+    display: inline-block;
+    background-color: #fff;
+    outline: none;
+    white-space: nowrap;
+    -webkit-user-select: none;
+    cursor: pointer;
+    padding: 2em;
+    margin-bottom: 2em;
+    letter-spacing: .05em;
+    font-size: 1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    font-weight: 400;
+    width: 100%;
+}
+
+

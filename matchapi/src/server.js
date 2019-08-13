@@ -5,7 +5,6 @@ const cors = require('cors');
 const parser = require('body-parser');
 const mysql = require('mysql');
 
-
 const setupRouter = require('./routes/setup');
 const authRouter = require('./routes/auth');
 const userRouter = require('./routes/user');
@@ -41,14 +40,14 @@ module.exports = class Server {
         this.app.use('/auth', authRouter());
         this.app.use('/user', userRouter());
 
-        this.server = http.createServer(this.app)
+        this.server = http.createServer(this.app);
     }
 
     start() {
         this.db.connect((err) => {
             if (err) throw err
             this.server.listen(this.port, () => {
-                console.log(`server started on port ${this.port}`)
+                console.log(`server started on port ${this.port}`);
             })
         })
     }

@@ -1,306 +1,405 @@
 <template>
     <section>
-        <header>
+		<!-- GLOBAL ELEMENT -->
+    	<div id="wrapper" @click="open = !open" v-bind:class="{'go-to-right-black' : open, 'go-to-left-no' : !open}"></div>
 
-            <nav class="navbar-login-register text-align-center blanche blackpearl-bg">
-				<router-link to="/">
-                	<img class="logo-nav-matcha" alt="Matcha Logo" src="../../assets/matcha_logo.png">
-				</router-link>
+		<!-- Nav Top -->
+		<header id="header" v-bind:class="{'go-to-right' : open, 'go-to-left' : !open}"> 
 
-				<div class="navbar-float-menu-rigth register-login h-inherit absolute inline-flex right-0 top-0">
-                   <router-link tag="div" to="/login" class="flex-center-middle blanche h-100"><p>LOGIN</p></router-link>
-                   <router-link tag="div" to="/register" class="flex-center-middle blanche h-100"><p>REGISTER</p></router-link>
-                </div>
+			<!-- Burger Wraper -->
+			<div id="open-nav" @click="open = !open">
+				<div id="hamburger" v-bind:class="{ 'open' : open }">
+					<span></span>
+					<span></span>
+					<span></span>
+				</div>
+				<p>menu</p>
+			</div>
 
-            </nav>
-            
+			<!-- Matcha logo -->
+			<router-link to="/" class="logo">
+				<img class="logo-nav-matcha bimboom" alt="Matcha Logo" src="../../assets/matcha_logo.png">
+			</router-link>
 
+			<!-- IF LOG -->
+			<div v-if="islog" class="account">
+			<p> {{ userinfo.first_name }} </p>
+			<img v-bind:src="avatar" alt="avatar">
+			<ul>
+				<a href=""><li>Profile</li></a>
+				<a href=""><li>Settings</li></a>
+				<a href=""><li>log out</li></a>
+			</ul>
+			</div>
+			<!-- IF NO LOG -->
+			<div  v-else class="reg-log">
+				<router-link tag="a" to="/login">login</router-link>
+				<router-link tag="a" to="/register">register</router-link>
+			</div>
 
-            <!-- <nav v-if="$route.name === 'home'" class="navbar-login-register text-align-center ubuntu-bold blanche yodhal">
-                <nuxt-link @click.native="$scrollToTop" :to="{name: 'main_search'}">
-                    <img alt="Vue logo" src="./assets/matcha_logo.png">
-                </nuxt-link>
-                <div class="navbar-float-menu-rigth register-login h-inherit absolute inline-flex right-0 top-0">
-                    <nuxt-link @click.native="$scrollToTop" to="/login" tag="div" class="flex-center-middle blanche h-100"><p>{{ $t("auth.login") }}</p></nuxt-link>
-                    <nuxt-link @click.native="$scrollToTop" to="/register" tag="div" class="flex-center-middle rhaegal-bg blanche h-100"><p>{{ $t("auth.register") }}</p></nuxt-link>
-                </div>
-            </nav> -->
+		</header>
 
-            
-        </header>
+		<!-- Left Nav -->
+		<nav id="nav" v-bind:class="{'fade-in-left' : open, 'fade-out-left' : !open}">
+			<ul class="menu">
+				<router-link v-on:click.native="open = !open" tag="a" to="/"><li v-bind:style= "this.$route.path === '/' ? 'color: #01a3a4' : 'color: #fff'">Home</li></router-link>
+				<router-link v-on:click.native="open = !open" tag="a" to="/login"><li v-bind:style= "this.$route.path === '/x' ? 'color: #01a3a4' : 'color: #fff'">Autre page</li></router-link>
+				<a @click="open = !open" href="https://twitter.com/intent/tweet?text=Join Camagru 😋" target="_blank"><li>Partager</li></a>
+			</ul>
+		</nav>
     </section>
 </template>
 
+
+
+<script>
+export default {
+    name: "Header",
+    data(){
+        return {
+			userinfo: {},
+			oklm: '',
+			avatar:'https://s3.eu-west-3.amazonaws.com/pikomit/users/5b93235366cf193a01a12957/8E3vAF7dYUOnYlqH0itKjPhNlH4QPQ1565128107465_400px.jpg',
+			islog: true,
+			open: false
+        }
+    },
+    methods:{
+		async fetchSglUsers() {
+			try {
+				const res = await this.$api.get('/user/all/1');
+				this.userinfo = res.data;
+			} catch (ex) {
+				console.log(ex)
+			}
+		}
+	},
+	mounted(){
+		this.fetchSglUsers();
+	}
+}
+</script>
+
+
+
 <style type="text/css">
 
-/****************************************************************
-	NAVBAR
+/*****************************************************************
+	HEADER
 *****************************************************************/
-
-nav{
-	width: 100vw;
-	height: 70px;
-	position: fixed;
-	top: 0px;
-	right: 0px;
-	left: 0px;
-	padding-left: 295px;
-	bottom: 0px;
-	z-index: 42;
-	box-sizing: border-box;
-}
-
-.navbar-div-black{
-	position: fixed;
-	top: 0px;
-	left: 0px;
-	width: 100vw;
-	height: 56px;
-	z-index: 41;
-	background-color: #0000001a;
-}
-
-.icon-notif {
-	width: auto;
-	padding: 2px 8px;
-	border-radius: 15px;
-	font-size: 12px;
-	top: -6px;
-	right: -20px;
-	z-index: 22;
-	border: 2px solid #38455c;
-}
-
-.icon-notif-responsive {
-	left: 15px;
-	top: 3px;
-}
-
-/**** MENU-LEFT ****/
-.navbar-float-menu-left .navbar-action{
-	height: 100%;
-	border-left: 0.1em solid #3f4b60;
-	box-sizing: content-box;
-	width: 100px;
-}
-
-.navbar-float-menu-left .navbar-action:hover{
-	background: -o-linear-gradient(top, rgba(0,0,0,0) 0%, rgba(8,139,140,0.2) 100%);
-	background: -ms-linear-gradient(top, rgba(0,0,0,0) 0%, rgba(8,139,140,0.2) 100%);
-	background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(8,139,140,0.2) 100%);
-}
-
-.navbar-float-menu-left .router-link-active svg{
+header#header {
+    height: 75px;
+    background-color: #38455c;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    border-bottom : 6px solid #f27073;
+	position: relative;
 	color: #fff;
-	fill: #fff;
 }
 
-.navbar-float-menu-left a:nth-child(1) svg{width: 22px;}
-.navbar-float-menu-left a:nth-child(2) svg{width: 19px;}
-.navbar-float-menu-left a:nth-child(3) svg {width: 22px;}
-.navbar-float-menu-left a:nth-child(4) svg {width: 22px;}
-
-.navbar-float-menu-left svg {
-	z-index: 2;
-	fill: #94a0b0;
-	padding: 0;
-	margin: 0;
-	margin-top: 7px;
+/********* HEADER OPEN NAV *********/
+header#header div#open-nav {
+    display: flex;
+    align-items: center;
+    padding: 0 2em;
+    border-right: 2px solid #ffffff14;
+    cursor: pointer;
+    z-index: 9;
+}
+header#header div#open-nav p, nav ul > li {
+    letter-spacing: .2px;
+    margin: 0 20px;
+    font-size: 20px;
+    text-transform: uppercase;
+	white-space:nowrap;
+	color: #fff;
 }
 
-.navbar-search {
-    border-right: 1.5px solid #3f4b60;
+/* hamburger */
+#hamburger {
+    width: 25px;
+    height: 18px;
+    transform: rotate(0deg);
+    transition: .5s ease-in-out;
+    cursor: pointer;
+    z-index: 10;
+}
+#hamburger span {
+    display: block;
+    position: absolute;
+    height: 2px;
+    width: 100%;
+    background: #fff;
+    opacity: 1;
+    left: 0;
+    transform: rotate(0deg);
+    transition: .25s ease-in-out;
+}
+/* if close */
+#hamburger span:nth-child(1) {
+    top: 0px;
+    transform-origin: left center;
+}
+#hamburger span:nth-child(2) {
+    top: 7px;
+    transform-origin: left center;
+}
+#hamburger span:nth-child(3) {
+    top: 14px;
+    transform-origin: left center;
+}
+/* else open */
+#hamburger.open span:nth-child(1) {
+    transform: rotate(45deg);
+    top: -3px;
+    left: 8px;
+}
+#hamburger.open span:nth-child(2) {
+    width: 0%;
+    opacity: 0;
+}
+#hamburger.open span:nth-child(3) {
+    transform: rotate(-45deg);
+    top: 15px;
+    left: 8px;
 }
 
-/* BAR BOTTOM */
-.bar-bottom-navbar{
-	height: 6px;
-	bottom: 0px;
-	transition: all 272ms ease-in-out;
-	-webkit-transition: all 272ms ease-in-out;
-	-moz-transition: all 272ms ease-in-out;
+/********* HEADER LOGO *********/
+header a.logo {
+    height: 100%;
+}
+header a.logo img {
+	margin-top: 10px;
+    height: 55px;
 }
 
-/**** MENU RIGHT ****/
-.navbar-float-menu-rigth button{
-	margin-right: 15px;
+/* IF NOT LOG */
+/********* HEADER LOGIN / REGISTER *********/
+header div.reg-log {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+header div.reg-log a {
+	display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 calc(2vw + 40px);
+    font-size: 20px;
+    text-transform: capitalize;
+    color: #fff;
+}
+header div.reg-log a:nth-child(2) {
+    background-color: #f27073;
 }
 
-.navbar-avatar{
-	width: 36px;
-	height: 36px;
-	margin: 0px 7.5px;
+/* IF NOT LOG */
+/********* HEADER PROFILE *********/
+header div.account {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 0 calc(2vw + 10px);
+}
+header div.account img {
+    border-radius: 100%;
+	width: 50px;
+    height: 50px;
+}
+header div.account p {
+	font-size: 18px;
+    text-transform: uppercase;
+    font-weight: 400;
+    margin: 20px;
+    color: #fff;;
 }
 
-/*****************************************************************
-	LOGIN-REGISTER
-*****************************************************************/
+header div.account ul {
+    visibility: hidden;
+    opacity: 0;
 
-.navbar-login-register{
-	font-size: 12.35px;
-	word-spacing: 1px;
-	letter-spacing: -0.5px;
-	width: 100vw;
-	padding-left: 0px;
+    z-index: 200;
+    position: absolute;
+    top: 70px;
+    right: 50px;
+    width: 270px;
+
+    background-color: #fff;;
+    box-shadow: 0px 0px 11px 1px #0000000f;
+    border-radius: 5px;
+    
+    transform: translateY(25px);
+    transition: all .2s ease-in-out;
 }
-
-/**** LOGO ****/
-.logo-nav-matcha {
-    margin-top: 14px;
-    width: 140px;
+header div.account ul li:hover {
+    background-color: #a7b3b325;
+    transition: all .2s ease-in-out;
 }
-
-/**** MENU-RIGHT ****/
-.register-login div{
-	cursor: pointer;
-	min-width: 150px;
-	background: #088b8c;
-}
-.register-login div:nth-child(2){
-	background: #f5836a;
-}
-
-.register-login p{
-	font-size: 16px;
-	letter-spacing: 0.15px;
-	word-spacing: .5px;
-	transition: .2s;
-	margin: 8px 30px 0 30px
-}
-
-/*****************************************************************
-	WHITE
-*****************************************************************/
-
-.navbar-white{
-	padding: 0px;
-	height: 70px;
-	border-bottom: 2px solid #eef1f7;
-}
-
-.navbar-white svg{
-	width: 95px;
-}
-
-/*****************************************************************
-	DIV CLICK AVATAR
-*****************************************************************/
-
-.dropdown-menu-navbar{
-	top: 64px;
-	right: 115px;
-	min-width: 190px
-}
-
-.dropdown-menu-navbar .username{
-	padding: 15px 15px 10px 15px;
-}
-
-.dropdown-menu-navbar h1{
-	margin-right: 10px;
+header div.account ul li {
+    padding: 1.5em 2em; 
+    border-bottom : 2px solid #00000009;
+	font-weight: 500;
 	font-size: 18px;
 }
-
-.dropdown-menu-navbar img{
-	width: 20px;
+header div.account ul a:nth-last-child(1) li{
+    text-align: right;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    white-space: nowrap;
+	font-weight: 300;
+	color: #f27073;
 }
 
-.dropdown-menu-navbar hr{
-	border : 0;
-	height: 2px;
-	background-image: linear-gradient(to right, rgba(39, 48, 63, 0.55), #27303f, rgba(39, 48, 63, 0.55));
+header div.account:hover ul, header div.account:active ul, header div.account:focus ul{
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
 }
 
-.dropdown-menu-navbar ul li{
-	padding: 7px 16px;
+
+/*****************************************************************
+	NAV
+*****************************************************************/
+
+/********* NAV CONTAINER *********/
+nav {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    bottom: 0;
+    width: 320px;
+    height: 100vh;
+    background-color: #38455c;
+	visibility: hidden;
+	z-index: 100;
+}
+nav ul {
+    display: flex;
+	flex-direction: column;
 }
 
-.dropdown-menu-navbar ul li:nth-child(1){
-	margin-top: -2px;
+nav ul .activepage {
+    color: #01a3a4;
 }
-
-.dropdown-menu-navbar ul li:nth-last-child(1){
-	margin-bottom: 8px;
+nav ul li {
+    padding: 30px 30px; 
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-bottom : 2px solid #ffffff42;
 }
-
-.dropdown-menu-navbar ul li:hover{
-	background-color: #088b8c;
+nav ul li{
+	font-weight: 500;
+	color: #fff;
+	font-size: 20px;
 }
-
-.dropdown-menu-navbar p{
-  font-size: 16px;
+nav ul li:hover {
+    background-color: #eea451e3;
+    transition: all .2s ease-in-out;
 }
 
 /*****************************************************************
-	RESPONSIVE
+	ANIMATION
 *****************************************************************/
 
-.navbar-float-menu-left-burger {
-	margin-left: 15px;
-	display: none;
+/********* BLACK IN BLACK *********/
+@keyframes go-to-black{
+	0% { opacity: 0; }
+	100% { opacity: 1; }
+}
+.go-to-right-black {
+	opacity: 0;
+	background-color: #000000bf;
+	width: 100vw;
+	height: 100vh;
+	position: fixed;
+	z-index: 1000;
+	overflow: hidden;
+	animation: go-to-black .7s ease-out 0s 1 normal forwards running, go-to-right .6s ease-out 0s 1 normal forwards running;
 }
 
-.navbar-float-menu-left-burger svg {
-	width: 30px;
-	height: auto;
+/********* GOT TO NO *********/
+@keyframes go-to-no{
+	0% { opacity: 1; }
+	100% { opacity: 0; visibility: hidden; }
+}
+.go-to-left-no {
+	opacity: 0;
+	background-color: #000000bf;
+	width: 100vw;
+	height: 100vh;
+	position: fixed;
+	z-index: 1000;
+	overflow: hidden;
+	animation: go-to-no .7s ease-out 0s 1 normal forwards running, go-to-left .6s ease-out 0s 1 normal forwards running;
 }
 
-.navbar-float-menu-left-burger-outside {
-	display: none;
-	background-color: rgba(36,47,66,0.7098);
-	z-index: 42;
+
+/********* GO TO LEFT *********/
+@keyframes go-to-left{
+	0% { transform: translate3d(20em, 0, 0); }
+	100% { transform: translate3d(0em, 0, 0); }
+}
+.go-to-left {
+	animation: go-to-left .6s ease-out 0s 1 normal forwards running;
+	z-index: 2;
 }
 
-@media (min-width: 0px) and (max-width: 900px) {
-	nav {
-		padding-left: 0px;
-	}
-
-	.navbar-float-menu-left {
-		margin-left: 60px;
-	}
-
-	.navbar-float-menu-left .navbar-action{
-		    width: 60px;
-	}
-
-	.navbar-float-menu-left-burger {
-		display: flex;
-	}
-
-	.logo-pikomit-pantheon {
-		position: absolute;
-		left: 25px;
-	}
-	
-	.navbar-avatar{
-		margin-right: 15px;
-	}
-
-	.navbar-float-menu-rigth button{
-		display: none;
-	}
-
-	.bar-bottom-navbar{
-		display: none;
-	}
-	
-	.dropdown-menu-navbar{
-		right: 10px;
-	}
+/********* GO TO RIGHT *********/
+@keyframes go-to-right {
+	100% { transform: translate3d(20em, 0, 0); }
+}
+.go-to-right {
+	animation: go-to-right .6s ease-out 0s 1 normal forwards running;
+	z-index: 2;
 }
 
-@media (min-width: 0px) and (max-width: 600px) {
-	.register-login-mobile{
-		position: fixed;
-		top: unset;
-		bottom: 0px;
-		width: 100%;
-		border-top: 2px solid #00000047;
+ 
+/********* FADE IN LEFT *********/
+@keyframes fade-in-left {
+0% {
+	opacity: 0;
+	transform: translate3d(-20em, 0, 0);
+}
+100% {
+	opacity: 1;
+	transform: translate3d(0, 0, 0);
+}
+}
+.fade-in-left {
+	visibility: visible;
+	animation: fade-in-left .6s ease-out 0s 1 normal forwards running;
+}
+
+/********* FADE OU LEFT *********/
+@keyframes fade-out-left {
+	0% { opacity: 1; }
+	100% {
+		opacity: 0;
+		transform: translate3d(-20em, 0, 0);
+		visibility: hidden;
 	}
-	.register-login-mobile div{
-		width: 50%;
-	}
+}
+.fade-out-left {
+	visibility: visible;
+	animation: fade-out-left .6s ease-out 0s 1 normal forwards running;
+}
+
+
+/********* BIM BOOM *********/
+@keyframes bimboom {
+	0% { transform: scale3d(1, 1, 1);}  
+	30% { transform: scale3d(1.25, 0.75, 1);}  
+	40% { transform: scale3d(0.75, 1.25, 1);}  
+	50% { transform: scale3d(1.15, 0.85, 1);}  
+	65% { transform: scale3d(0.95, 1.05, 1);}  
+	75% { transform: scale3d(1.05, 0.95, 1);}  
+	100% { transform: scale3d(1, 1, 1);}
+}
+.bimboom {
+	animation: bimboom 2.5s ease-out 0s 1 normal forwards running;
 }
 
 </style>

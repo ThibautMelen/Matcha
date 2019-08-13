@@ -6,6 +6,7 @@
     <!-- <comp-footer/> -->
 
   </div>
+  
 </template>
 
 <script>
@@ -22,8 +23,6 @@ export default {
 </script>
 
 <style>
-  @import './css/animation.css';
-  @import './css/colors.css';
-  @import './css/font.css';
+  /* @import './css/colors.css'; */
   @import './css/global.css';
 </style>
