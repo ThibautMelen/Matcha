@@ -186,7 +186,7 @@ header div.reg-log a {
 	display: flex;
     align-items: center;
     height: 100%;
-    padding: 0 calc(2vw + 40px);
+    padding: 0 calc(2% + 40px);
     font-size: 20px;
     text-transform: capitalize;
     color: #fff;
@@ -201,7 +201,7 @@ header div.account {
     display: flex;
     align-items: center;
     cursor: pointer;
-    padding: 0 calc(2vw + 10px);
+    padding: 0 calc(2% + 10px);
 }
 header div.account img {
     border-radius: 100%;
@@ -270,7 +270,7 @@ nav {
     position: fixed;
     bottom: 0;
     width: 320px;
-    height: 100vh;
+    height: 100%;
     background-color: #38455c;
 	visibility: hidden;
 	z-index: 100;
@@ -312,8 +312,8 @@ nav ul li:hover {
 .go-to-right-black {
 	opacity: 0;
 	background-color: #000000bf;
-	width: 100vw;
-	height: 100vh;
+	width: 100%;
+	height: 100%;
 	position: fixed;
 	z-index: 1000;
 	overflow: hidden;
@@ -328,8 +328,8 @@ nav ul li:hover {
 .go-to-left-no {
 	opacity: 0;
 	background-color: #000000bf;
-	width: 100vw;
-	height: 100vh;
+	width: 100%;
+	height: 100%;
 	position: fixed;
 	z-index: 1000;
 	overflow: hidden;

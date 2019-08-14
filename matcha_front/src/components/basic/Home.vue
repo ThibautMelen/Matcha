@@ -1,41 +1,60 @@
 <template>
 <div>
     <section id="match">
-        
+
+        <!-- card -->
         <div class="container-swipe">
-            <Vue2InteractDraggable
-                @draggedDown="draggedDown"
-                @draggedLeft="draggedLeft"
-                @draggedRight="draggedRight"
-                @draggedUp="draggedUp"
-                :interact-max-rotation="15"
-                :interact-out-of-sight-x-coordinate="500"
-                :interact-x-threshold="200"
-                :interact-event-bus-events="interactEventBusEvents"
-                v-if="isShowing"
-                class="card isCurrent"
-                v-bind:style="{ backgroundImage: 'url(/static/margot-robbie.jpg)' }"
-                >
-                
-    
-            </Vue2InteractDraggable>
-        
-        </div>
-
-        <!-- <div id="presentation">
-            <div class="buddy">
-                <div class="avatar" style="display: block; background-image: url(http://static.stylemagazin.hu/medias/29280/Nem-ehezik-a-Women-of-the-Year-legjobb-modell-dijara-eselyes-szepseg_32fc7c86954a8847610499a0fc7261e2.jpg)"></div>
+            <div style="z-index: 3">
+                <Vue2InteractDraggable
+                    v-if="isVisible"
+                    @draggedDown="draggedDown"
+                    @draggedLeft="draggedLeft"
+                    @draggedRight="draggedRight"
+                    @draggedUp="draggedUp"
+                    :interact-out-of-sight-x-coordinate="500"
+                    :interact-max-rotation="15"
+                    :interact-x-threshold="200"
+                    :interact-y-threshold="200"
+                    :interact-event-bus-events="interactEventBusEvents"
+                    class="card"
+                    v-bind:style="{ backgroundImage: `url(${current.img})` }"
+                    >
+                    <div class="card-info">
+                        <p>{{current.text}}</p>
+                    </div>
+                </Vue2InteractDraggable>
             </div>
-        </div> -->
-        <!-- <div id="valid">
-            <input type="submit" value="NOP">
-            <input type="submit" value="LIKE">
-        </div> -->
-    </section>
 
+            <div
+                v-if="next"
+                class="card card-next"
+                v-bind:style="{ backgroundImage: `url(${next.img})` }"
+                style="z-index: 2">
+                <div class="card-info">
+                    <p>{{next.text}}</p>
+                </div>
+            </div>
+
+            <div
+                v-if="index + 2 < cards.length"
+                class="card card-next"
+                v-bind:style="{ backgroundImage: `url(${current.img})` }"
+                style="z-index: 1">
+                <div class="flex flex--center" style="height: 100%">
+                    <p>{{next.text}}</p>
+                </div>
+            </div>
+
+            <!-- buton -->
+            <div id="valid" >
+                <input @click="dragLeft()" type="submit" value="NOP">
+                <input @click="dragRight()" type="submit" value="LIKE">
+            </div>
+
+        </div>
+    </section>
 </div>
 </template>
-
 
 
 <script>
@@ -50,7 +69,20 @@ export default {
     name: "Home",
     data () {
         return {
-            isShowing: true,
+            isVisible: true,
+            cards: [
+                {
+                    text: 'Margot Robbie',
+                    img: `/static/margot-robbie.jpg`
+                },                {
+                    text: 'Emma Watson',
+                    img: `/static/emma-watson.jpg`
+                },                {
+                    text: 'Shrek',
+                    img: `/static/shrek.jpg`
+                }
+            ],
+            index: 0,
             interactEventBusEvents: {
                 draggedDown: INTERACT_DRAGGED_DOWN,
                 draggedLeft: INTERACT_DRAGGED_LEFT,
@@ -62,41 +94,59 @@ export default {
     components: {
         Vue2InteractDraggable,
     },
-
+    computed: {
+        current() {
+            return this.cards[this.index]
+        },
+        next() {
+            return this.cards[this.index + 1]
+        }
+    },
     methods:{
         draggedDown() {
-          console.log("dragged down!");
-          this.hideCard();
+            setTimeout(() => this.isVisible = false, 200);
+            setTimeout(() => {
+                this.index++;
+                this.isVisible = true;
+            }, 300);
         },
 
         draggedLeft() {
-          console.log("dragged left!");
-          this.hideCard();
+            setTimeout(() => this.isVisible = false, 200);
+            setTimeout(() => {
+                this.index++;
+                this.isVisible = true;
+            }, 300);
         },
 
         draggedRight() {
-          console.log("dragged right!");
-          this.hideCard();
+            setTimeout(() => this.isVisible = false, 200);
+            setTimeout(() => {
+                this.index++;
+                this.isVisible = true;
+            }, 300);
         },
 
         draggedUp() {
-          console.log("dragged up!");
-          this.hideCard();
+            setTimeout(() => this.isVisible = false, 200);
+            setTimeout(() => {
+                this.index++;
+                this.isVisible = true;
+            }, 300);
         },
 
         hideCard() {
           setTimeout(() => {
-            this.isShowing = false;
+            this.isVisible = false;
           }, 200);
           setTimeout(() => {
-            this.isShowing = true;
+            this.isVisible = true;
           }, 1000);
         },
 
         dragDown() {
           InteractEventBus.$emit(INTERACT_DRAGGED_DOWN);
         },
-
         dragLeft() {
           InteractEventBus.$emit(INTERACT_DRAGGED_LEFT);
         },
@@ -116,9 +166,20 @@ export default {
 
 </script>
 
-<style type="text/css">
+<style type="text/css" scoped>
 
-.container-swipe{
+/********* MAIN *********/
+section#match {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+
+
+
+/********* CONTAINER SWIPE *********/
+section#match .container-swipe{
     width: 100%;
     height: 100%;
     position: absolute;
@@ -129,68 +190,62 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+    display: flex;
+    flex-direction: column;
 }
 
-.container-swipe .card{
-    height: 480px;
-    width: 462px;
+
+
+/********* MAIN CARD *********/
+section#match .container-swipe .card{
+    height: 500px;
+    width: 440px;
     background: #fff;
     border: 20px solid #fff;
-    border-radius: 10px;
+    border-radius: 60px;
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
-    -o-background-size: cover;
     box-shadow: 0px 0px 19px -4px rgba(111, 111, 111, 0.75);
-}
-
-section#match {
     display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    flex-direction: column;
-}
-
-/********* PRESENTATION *********/
-div#presentation {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-/********* BUDY SWIPE *********/
-div#presentation div.buddy{
-    /* width: 470px; */
-    padding: 35px;
-    margin-top: 30px;
-    background: white;
-    border-radius: 25px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    box-shadow: 0 0 10px rgba(0,0,0,0.2);
-    position: absolute;
+    align-items: flex-end;
+    position: fixed;
+    left: 50%;
+    top: 45%;
+    transform: translate(-50%, -50%);
     cursor: grab;
 }
-div#presentation div.buddy .avatar {
-    background: #222;
-    width: 350px;
-    height: 350px;
-    display: block;
-    background-size: auto 160% !important;
-    background-position: center;
-    background-repeat: no-repeat;
-    border-radius: 20px;
+
+/* next card */
+section#match .container-swipe .card-next{
+    top: 46%;
+    width: 420px;
 }
 
-/********* VALID *********/
+/********* INFO IN CARD *********/
+div.card-info {
+    display: flex;
+    justify-content: center;
+    background: #38455ceb;
+    height: 70px;
+    align-items: center;
+    flex-direction: column;
+    width: 100%;
+    border-radius: 0 0 40px 40px;
+}
+div.card-info p{
+    font-size: 20px;
+    color: #fff;
+}
+
+
+/********* BUTTON VALID *********/
 div#valid {
     display: flex;
     flex-direction: row;
     justify-content: center;
+    position: fixed;
+    top: 70%;
 }
 
 div#valid input{
