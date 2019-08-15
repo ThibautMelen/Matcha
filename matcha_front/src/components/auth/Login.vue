@@ -26,7 +26,7 @@
             </div>
 
             <div class="input-group">
-                <input type="submit" class="MedievalSharp w-100 rhaegal-bg blanche cursor-pointer hvr-up-min border-radius-14" value="Se connecter">
+                <input type="submit" value="Se connecter">
             </div>
 
 

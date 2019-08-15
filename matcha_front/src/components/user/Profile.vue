@@ -2,15 +2,17 @@
     <section id="profil">
 
 
-        <div id="left">
-			<img v-bind:src="userinfo.avatar[0]" alt="avatar">
-            <input type="submit">
-            
+        <div v-if="userinfo" id="left">
+                {{ userinfo }}
+			<img v-bind:src="userinfo.avatar[1]" alt="avatar">
+            <button v-if="profilelike.status == 0" @click="like()">Like</button>
+            <button v-if="profilelike.status == 1" @click="likeback()">Like back</button>
         </div>
 
         <div id="info">
             <h1>{{ userinfo.first_name }} {{ userinfo.last_name }}</h1>
-            <h3><i>{{ userinfo.username }} · </i></h3>
+            <h3 v-if="userinfo.online"><i>{{ userinfo.username }} · <span>Online</span></i></h3>
+            <h3 v-else><i>{{ userinfo.username }} · {{userinfo.last_co}}</i></h3>
             <h2>{{ userinfo.type }} - {{ userinfo.age }} <b>years old</b></h2>
             <h4>{{ userinfo.first_name }} search
                 <span v-for="(item, index) in userinfo.orientation" :key="item">
@@ -29,26 +31,27 @@
 </template>
 
 
-
 <script>
 export default {
     name: "Profile",
     data(){
         return {
 			userinfo: {
-                username: `maggot`, //
-                first_name: `Margot`, //
-                last_name: `Robbie`, //
-                bio: `Margot Elise Robbie is an Australian actress and film producer. She has received nominations.`, //
-                type: `female`, //
-                age: `29`, //
-                online: true,
+                username: `maggot`,
+                first_name: `Margot`,
+                last_name: `Robbie`,
+                bio: `Margot Elise Robbie is an Australian actress and film producer. She has received nominations.`,
+                type: `female`,
+                age: `29`,
+                online: false,
                 last_co: `15/08/2019`,
-                orientation: [`mdrr`, `male`, `female`], //
-                interest: [`cinema`, `fashion`, `pikomit`, `comedy`, `marvel`, `coca cola`], //
+                orientation: [`mdrr`, `male`, `female`],
+                interest: [`cinema`, `fashion`, `pikomit`, `comedy`, `marvel`, `coca cola`], 
                 avatar: [`https://us.hola.com/imagenes/health-and-beauty/2019080826791/margot-robbie-lash-treatment-mascara-sharon-tate/0-196-115/Margot-Robbie-Lashes-m.jpg?filter=w400`, `https://s1.r29static.com//bin/entry/cd4/720x864,85/2188557/the-touching-way-margot-robbie-2188557.webp`]
             },
-			avatar:'https://s3.eu-west-3.amazonaws.com/pikomit/users/5b93235366cf193a01a12957/8E3vAF7dYUOnYlqH0itKjPhNlH4QPQ1565128107465_400px.jpg'
+            profilelike: {
+                status: 0
+            }
         }
     },
     methods:{
@@ -59,7 +62,22 @@ export default {
 			} catch (ex) {
 				console.log(ex)
 			}
-		}
+        },
+        async like() {
+          	try {
+                alert(`Like this profile`);
+                profilelike.status = 1;
+			} catch (ex) {
+				console.log(ex)
+			}  
+        },
+        async likeback() {
+          	try {
+				alert(`Like this profile`);
+			} catch (ex) {
+				console.log(ex)
+			}  
+        }
 	},
 	mounted(){
 		this.fetchSglUsers();
@@ -71,7 +89,7 @@ export default {
 
 <style type="text/css">
 /*****************************************************************
-	SECTION
+	SECTION PROFILE
 *****************************************************************/
 section#profil {
     display: flex;
@@ -81,9 +99,9 @@ section#profil {
     margin-top: 5%;
 }
 
-
-
-/********* LEFT *********/
+/*****************************************************************
+	LEFT
+*****************************************************************/
 section#profil div#left {
     padding: 25px;
     background: #fff;
@@ -100,13 +118,19 @@ section#profil div#left img {
     border-radius: 70px;
 }
 
-section#profil div#left input {
+section#profil div#left button {
     padding: 10px;
-    background: red;
+    background: #ed5673;
     color: #fff;
+    font-size: 18px;
+    border-radius: 15px;
+    margin-top: 15px;
+    cursor: pointer;
 }
 
-/********* INFO *********/
+/*****************************************************************
+	INFO
+*****************************************************************/
 section#profil div#info {
     width: 600px;
     background-color: #fff;
@@ -136,6 +160,10 @@ section#profil div#info h3 {
     font-size: 18px;
     text-transform: uppercase;
     color: #d2d2d2;
+}
+section#profil div#info h3 span{
+    font-size: 18px;
+    color:#00b894;
 }
 
 /* Type + age */
