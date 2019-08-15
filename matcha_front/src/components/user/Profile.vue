@@ -1,14 +1,30 @@
 <template>
     <section id="profil">
-        <div id="img">
-			<img v-bind:src="avatar" alt="avatar">
+
+
+        <div id="left">
+			<img v-bind:src="userinfo.avatar[0]" alt="avatar">
+            <input type="submit">
+            
         </div>
+
         <div id="info">
             <h1>{{ userinfo.first_name }} {{ userinfo.last_name }}</h1>
-            <h3>{{ userinfo.username }}</h3>
-            <p>{{ userinfo.type }} - {{ userinfo.age }} years old</p>
+            <h3><i>{{ userinfo.username }} · </i></h3>
+            <h2>{{ userinfo.type }} - {{ userinfo.age }} <b>years old</b></h2>
+            <h4>{{ userinfo.first_name }} search
+                <span v-for="(item, index) in userinfo.orientation" :key="item">
+                    {{ item }}<span v-if="(index + 2) < userinfo.orientation.length">, </span><span v-if="(index + 2) == userinfo.orientation.length"> & </span>
+                </span>.
+            </h4>
+            <h4>{{ userinfo.first_name }} like
+                <span v-for="(item, index) in userinfo.interest" :key="item">
+                    {{ item }}<span v-if="(index + 2) < userinfo.interest.length">, </span><span v-if="(index + 2) == userinfo.interest.length"> & </span>
+                </span>.
+            </h4>
             <p>{{ userinfo.bio }}</p>
         </div>
+
     </section>
 </template>
 
@@ -16,10 +32,22 @@
 
 <script>
 export default {
-    name: "Home",
+    name: "Profile",
     data(){
         return {
-			userinfo: {},
+			userinfo: {
+                username: `maggot`, //
+                first_name: `Margot`, //
+                last_name: `Robbie`, //
+                bio: `Margot Elise Robbie is an Australian actress and film producer. She has received nominations.`, //
+                type: `female`, //
+                age: `29`, //
+                online: true,
+                last_co: `15/08/2019`,
+                orientation: [`mdrr`, `male`, `female`], //
+                interest: [`cinema`, `fashion`, `pikomit`, `comedy`, `marvel`, `coca cola`], //
+                avatar: [`https://us.hola.com/imagenes/health-and-beauty/2019080826791/margot-robbie-lash-treatment-mascara-sharon-tate/0-196-115/Margot-Robbie-Lashes-m.jpg?filter=w400`, `https://s1.r29static.com//bin/entry/cd4/720x864,85/2188557/the-touching-way-margot-robbie-2188557.webp`]
+            },
 			avatar:'https://s3.eu-west-3.amazonaws.com/pikomit/users/5b93235366cf193a01a12957/8E3vAF7dYUOnYlqH0itKjPhNlH4QPQ1565128107465_400px.jpg'
         }
     },
@@ -46,36 +74,97 @@ export default {
 	SECTION
 *****************************************************************/
 section#profil {
-    padding: 4% 20%;
     display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 5%;
 }
 
-section#profil h1 {
-    font-size: 25px;
-    text-transform: uppercase;
-    white-space:nowrap;
-    font-weight: 600;
-    margin-bottom: 10px;
+
+
+/********* LEFT *********/
+section#profil div#left {
+    padding: 25px;
+    background: #fff;
+    border-radius: 40px;
+    margin: 7px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
 }
 
-/********* IMG *********/
-section#profil div#img img {
-    margin-right: 50px;
-}
-section#profil div#img img {
+section#profil div#left img {
     width: 200px;
     height: 200px;
-    border-radius: 80px;
+    border-radius: 70px;
+}
+
+section#profil div#left input {
+    padding: 10px;
+    background: red;
+    color: #fff;
 }
 
 /********* INFO *********/
 section#profil div#info {
     width: 600px;
+    background-color: #fff;
+    border-radius: 40px;
+    padding: 30px;
+    margin: 7px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
 }
 
+section#profil div#info * {
+    width: 100%;
+    white-space: normal;
+}
+
+/* first_name + last_name */
+section#profil div#info h1 {
+    font-size: 25px;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: #ed5773;
+}
+
+/* Username + Offline / Online*/
+section#profil div#info h3 {
+    font-size: 18px;
+    text-transform: uppercase;
+    color: #d2d2d2;
+}
+
+/* Type + age */
+section#profil div#info h2 {
+    text-transform: capitalize;
+    margin-top: 10px;
+    font-size: 22px;
+    color: #f58469;
+}
+
+/* Orienstion */
+section#profil div#info h4 {
+    text-transform: capitalize;
+    margin-top: 10px;
+    font-size: 21px;
+    color: #5287e4;
+}
+
+section#profil div#info h4:last-child {
+    color: #6b84b1;
+}
+
+/* Bio */
 section#profil div#info p {
+    text-transform: capitalize;
     margin-top: 10px;
     font-size: 20px;
+    color: #8993a2;
 }
+
 
 </style>
