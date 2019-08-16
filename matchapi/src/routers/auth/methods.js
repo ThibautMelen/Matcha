@@ -1,6 +1,5 @@
-const Joi = require('@hapi/joi')
 const bcrypt = require('bcrypt');
-const util = require('util');//promisify (transformer function callback en promise)
+const util = require('util');/* promisify (transformer function callback en promesse) */
 
 const utils = require('../../utils');
 
@@ -9,19 +8,14 @@ const saltRounds = 10;
 module.exports = {
     login: async (req, res) => {
 
-        //JOI SCHEMA
-        const schema_login = Joi.object({
-            username: Joi.string().trim().lowercase().required(),
-            password: Joi.string().trim().required()
-        }).options({ stripUnknown: true, abortEarly: false });
-
-        //JOI EXECUTE
         let body;
         try {
-            body = await schema_login.validate(req.body);
-        } catch (ex) {
-            // return res.status(403).json(ex);
-            return res.status(203).json({error: 'joi_error', message: ex.details[0].message});
+            body = {
+                username: await utils.validator(req.body.username, {rules: ['string'], format: ['trim', 'lowercase']}),
+                password: await utils.validator(req.body.password, {rules: ['string'], format: ['trim']})
+            }
+        } catch (err) {
+            return res.status(400).json({error: 'invalid_data', message: err});
         }
 
         // INSERT
@@ -39,31 +33,29 @@ module.exports = {
                 res.status(200).json({ success: 'OK' });
             });
         } catch(ex) {
-            return res.status(520).json({ error: 'Erreur inconnu C' });
+            return res.status(520).json({ error: 'Unknown error' });
         }
     },
 
     register: async (req, res) => {
 
-        //JOI SCHEMA
-        const schema_register = Joi.object({
-            username: Joi.string().trim().alphanum().min(4).max(15).lowercase().required(),
-            password: Joi.string().trim().regex(/^[a-zA-Z0-9]{8,}$/).required(),
-            email: Joi.string().trim().regex(/^[^\W][a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)*\@[a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)*\.[a-zA-Z]{2,4}$/).required(),
-            first_name: Joi.string().trim().min(2).max(25).required(),
-            last_name: Joi.string().trim().min(2).max(25).required(),
-            bio: Joi.string().trim().min(10).max(100).required(),
-            age: Joi.number().min(16).required(),
-            type: Joi.string().trim().lowercase().valid('male','woman','alien','cyborg','giant','minks','elve','troll').required()
-        }).options({ stripUnknown: true, abortEarly: false });
-
-        //JOI EXECUTE
         let body;
         try {
-            body = await schema_register.validate(req.body);
-        } catch (ex) {
-            return res.status(203).json({error: 'joi_error', message: ex.details[0].message});
-            // return res.status(403).json(ex.details[0].message);
+            body = {
+                username: await utils.validator(req.body.username, {rules: ['string'], format: ['trim', 'lowercase']}),
+                password: await utils.validator(req.body.username, {rules: ['string'], format: ['trim']}),
+
+                username: await utils.validator(req.body.username, {rules: ['string', 'alphanumeric'], format: ['trim', 'lowercase'], min: 4, max: 15}),
+                password: await utils.validator(req.body.password, {rules: ['string'], regex: /^[a-zA-Z0-9]{8,}$/, format: ['trim'], max: 255}),
+                email: await utils.validator(req.body.email, {rules: ['string'], regex: /^[^\W][a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)*\@[a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)*\.[a-zA-Z]{2,4}$/, format: ['trim'], max: 255}),
+                first_name: await utils.validator(req.body.first_name, {rules: ['string'], format: ['trim'], min: 2, max: 25}),
+                last_name: await utils.validator(req.body.last_name, {rules: ['string'], format: ['trim'], min: 2, max: 25}),
+                bio: await utils.validator(req.body.last_name, {rules: ['string'], format: ['trim'], min: 10, max: 100}),
+                age: await utils.validator(req.body.last_name, {rules: ['number'], min: 16}),
+                type: await utils.validator(req.body.last_name, {rules: ['string'], format: ['trim', 'lowercase'], enum: ['male','woman','alien','cyborg','giant','minks','elve','troll']})
+            }
+        } catch (err) {
+            return res.status(203).json({error: 'joi_error', message: err});
         }
 
         console.log(body);
