@@ -1,16 +1,13 @@
-const express = require('express');
 const Joi = require('@hapi/joi')
 const bcrypt = require('bcrypt');
 const util = require('util');//promisify (transformer function callback en promise)
 
-const utils = require('../utils'); 
+const utils = require('../../utils');
 
 const saltRounds = 10;
 
-module.exports = () => {
-    const router = new express.Router();
-
-    router.post('/login', async (req, res) => {
+module.exports = {
+    login: async (req, res) => {
 
         //JOI SCHEMA
         const schema_login = Joi.object({
@@ -44,9 +41,9 @@ module.exports = () => {
         } catch(ex) {
             return res.status(520).json({ error: 'Erreur inconnu C' });
         }
-    });
+    },
 
-    router.post('/register', async (req, res) => {
+    register: async (req, res) => {
 
         //JOI SCHEMA
         const schema_register = Joi.object({
@@ -110,8 +107,5 @@ module.exports = () => {
         } catch(ex) {
             return res.status(520).json({ error: 'Erreur inconnu C' });
         }
-    });
-
-
-    return router;
-};
+    }
+}

@@ -46,10 +46,11 @@ export default {
     methods:{
 		async fetchSglUsers() {
 			try {
-                const res = await this.$api.get('/user/all/1');
-                
+                // const res = await this.$api.get('/user/all/1');
+                // this.userinfo = res.data;
+               
                 ////////// temporaire /////////////
-                res.data =  {
+                this.userinfo =  {
                     username: `maggot`,
                     first_name: `Margot`,
                     last_name: `Robbie`,
@@ -62,10 +63,9 @@ export default {
                     interest: [`cinema`, `fashion`, `pikomit`, `comedy`, `marvel`, `coca cola`], 
                     avatar: [`https://us.hola.com/imagenes/health-and-beauty/2019080826791/margot-robbie-lash-treatment-mascara-sharon-tate/0-196-115/Margot-Robbie-Lashes-m.jpg?filter=w400`, `https://s1.r29static.com//bin/entry/cd4/720x864,85/2188557/the-touching-way-margot-robbie-2188557.webp`],
                     liked: true
-                },
+                }
                 //////////////////////////////////
 
-                this.userinfo = res.data;
                 if (this.userinfo.liked)
                     this.profilelike = 1;
 			} catch (ex) {
@@ -200,6 +200,10 @@ section#profil div#info h4 {
     margin-top: 10px;
     font-size: 21px;
     color: #5287e4;
+}
+
+section#profil div#info h4 div {
+    display: inline;
 }
 
 section#profil div#info h4:last-child {

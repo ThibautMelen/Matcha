@@ -1,22 +1,14 @@
-const express = require('express');
-
-module.exports = () => {
-    const router = new express.Router();
-
-    //DB
-    // Create DB
-    router.get('/createdb', (req, res) => {
+module.exports = {
+    createdb: (req, res) => {
         let sql = 'CREATE DATABASE matchadb';
         req.db.query(sql, (err, results) => {
             if(err) throw err;
             console.log(results);
             res.json('Database created...');
         });
-    });
+    },
 
-    //TABLE
-    // Create table : users
-    router.get('/table_users', (req, res) => {
+    table_users: (req, res) => {
         
         let sql =   "CREATE TABLE `users` ( " + 
                     "`id` int PRIMARY KEY NOT NULL AUTO_INCREMENT," +
@@ -37,7 +29,5 @@ module.exports = () => {
             console.log(results);
             res.send('User table created...');
         });
-    });
-
-    return router;
+    }
 }

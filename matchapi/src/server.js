@@ -5,9 +5,9 @@ const cors = require('cors');
 const parser = require('body-parser');
 const mysql = require('mysql');
 
-const setupRouter = require('./routes/setup');
-const authRouter = require('./routes/auth');
-const userRouter = require('./routes/user');
+const setupRouter = require('./routers/setup/routes');
+const authRouter = require('./routers/auth/routes');
+const userRouter = require('./routers/user/routes');
 
 module.exports = class Server {
 
