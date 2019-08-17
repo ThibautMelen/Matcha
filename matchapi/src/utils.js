@@ -18,7 +18,7 @@ async function validator(field, options = {}) {
         throw 'Undefined value.'
     }
 
-    if (options.rules && typeof options.rules === 'object' && options.rules.isArray && options.rules.length > 0) {
+    if (options.rules && Array.isArray(options.rules) && options.rules.length > 0) {
         for (let rule of options.rules) {
             switch (rule) {
                 case 'string':
@@ -37,6 +37,10 @@ async function validator(field, options = {}) {
                     if (typeof field !== 'object') {
                         throw 'Not object.'
                     }
+                case 'array':
+                    if (Array.isArray(field)) {
+                        throw 'Not array.'
+                    }
                 case 'alphanumeric':
                     if (typeof field !== 'string' || !field.match(/^[a-z0-9]+$/i)) {
                         throw 'Not alphanumeric.'
@@ -47,7 +51,7 @@ async function validator(field, options = {}) {
 
     let newField = field
 
-    if (options.formats && typeof options.formats === 'object' && options.formats.isArray && options.formats.length > 0) {
+    if (options.formats && Array.isArray(options.formats) && options.formats.length > 0) {
         for (let format of options.formats) {
             switch (format) {
                 case 'trim':
@@ -71,6 +75,11 @@ async function validator(field, options = {}) {
                 throw 'Too small.'
             }
         }
+        else if (Array.isArray(newField)) {
+            if (newField < options.min) {
+                throw 'Not enough elements.'
+            }
+        }
     }
 
     if (typeof options.max === 'number' && options.max >= 0) {
@@ -78,11 +87,18 @@ async function validator(field, options = {}) {
             newField = newField.substring(0, options.max)
         }
         else if (typeof newField === 'number') {
-            throw 'Too big.'
+            if (newField > options.max) {
+                throw 'Too big.'
+            }
+        }
+        else if (Array.isArray(newField)) {
+            if (newField > options.max) {
+                throw 'Too much elements.'
+            }
         }
     }
 
-    if (options.enum && typeof options.enum === 'object' && options.enum.isArray && options.enum.length > 0) {
+    if (options.enum && Array.isArray(options.enum) && options.enum.length > 0) {
         if (!options.enum.includes(field)) {
             throw 'Not allowed value.'
         }
