@@ -4,7 +4,9 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import axios from "axios";
+import Chat from 'vue-beautiful-chat'
 
+Vue.use(Chat)
 Vue.config.productionTip = false
 
 Vue.use({

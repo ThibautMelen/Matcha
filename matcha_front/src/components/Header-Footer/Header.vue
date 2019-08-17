@@ -22,18 +22,18 @@
 			</router-link>
 
 			<!-- IF LOG -->
-			<div v-if="islog" class="account">
-			<p> {{ userinfo.first_name }} </p>
-			<img v-bind:src="avatar" alt="avatar">
-			<ul>
-				<a href=""><li>Profile</li></a>
-				<a href=""><li>Settings</li></a>
-				<a href=""><li>log out</li></a>
-			</ul>
+			<div v-if="userinfo.online" class="account">
+				<p> {{ userinfo.first_name }} </p>
+				<img v-bind:src="userinfo.avatar[0]" alt="avatar">
+				<ul>
+					<a @click="gotoprofile()"><li>Profile</li></a>
+					<router-link tag="a" to="/settings"><li>Profile</li></router-link>
+					<a href=""><li>log out</li></a>
+				</ul>
 			</div>
 			<!-- IF NO LOG -->
 			<div  v-else class="reg-log">
-				<router-link tag="a" to="/login">login</router-link>
+				<router-link tag="a" to="/login/">login</router-link>
 				<router-link tag="a" to="/register">register</router-link>
 			</div>
 
@@ -57,25 +57,44 @@ export default {
     name: "Header",
     data(){
         return {
-			userinfo: {},
-			oklm: '',
-			avatar:'https://s3.eu-west-3.amazonaws.com/pikomit/users/5b93235366cf193a01a12957/8E3vAF7dYUOnYlqH0itKjPhNlH4QPQ1565128107465_400px.jpg',
-			islog: true,
+			userinfo: false,
 			open: false
         }
     },
     methods:{
-		async fetchSglUsers() {
+		async fetchSglUsers(userid) {
 			try {
-				const res = await this.$api.get('/user/all/1');
-				this.userinfo = res.data;
+                // const res = await this.$api.get('/user/all/1');
+                // this.userinfo = res.data;
+				
+				console.log(userid);
+                ////////// temporaire /////////////
+                this.userinfo =  {
+                    username: `maggot`,
+                    first_name: `Margot`,
+                    last_name: `Robbie`,
+                    bio: `Margot Elise Robbie is an Australian actress and film producer. She has received nominations.`,
+                    type: `female`,
+                    age: `29`,
+                    online: true,
+                    last_co: `15/08/2019`,
+                    orientation: [`mdrr`, `male`, `female`],
+                    interest: [`cinema`, `fashion`, `pikomit`, `comedy`, `marvel`, `coca cola`], 
+                    avatar: [`https://us.hola.com/imagenes/health-and-beauty/2019080826791/margot-robbie-lash-treatment-mascara-sharon-tate/0-196-115/Margot-Robbie-Lashes-m.jpg?filter=w400`, `https://s1.r29static.com//bin/entry/cd4/720x864,85/2188557/the-touching-way-margot-robbie-2188557.webp`],
+                    liked: true
+                }
+                //////////////////////////////////
 			} catch (ex) {
-				console.log(ex)
+				console.log(ex);
 			}
+		},
+		async gotoprofile() {
+			console.log(`coucou`);
+			this.$router.push({name: 'ProfileComp', params: {id: 1}});
 		}
 	},
 	mounted(){
-		this.fetchSglUsers();
+		this.fetchSglUsers(this.$route.params.id);
 	}
 }
 </script>
