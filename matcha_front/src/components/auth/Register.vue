@@ -1,22 +1,6 @@
 <template>
-    
 
-    <!-- REGISTER 
-    <section id="sect">
-        <h1>Register<span> for Matcha 💙</span></h1>
-
-        <form method="POST" action="">
-            <input id="register_pseudo" name="register_pseudo" value="<?php if (isset($register_pseudo)) { echo $register_pseudo; } ?>" type="text" placeholder="pseudo" required="required" maxlength="255" >
-            <input id="register_email" name="register_email" value="<?php if (isset($register_email)) { echo $register_email; } ?>" type="email" placeholder="E-mail" required="required" maxlength="255">
-            <input id="register_password" name="register_password" type="password" placeholder="Password" required="required" minlength="8">
-            <div class="g-recaptcha" data-sitekey="6LcmcJUUAAAAAErxBXWYChbpIKnzikjM6OGyyQIv"></div>
-            <input id="register_submit" name="register_submit" type="submit" value="create my account">
-        </form>
-
-
-    </section>
-    -->
-
+    <!-- REGISTER -->
     <section id="sect">
         <form @submit.prevent="register()">
             
@@ -74,7 +58,7 @@
             <div class="input-group">      
                 <select v-model="formdata.type" required>
                     <option disabled>Choose a specie</option>
-                    <option>Male</option>
+                    <option selected>Male</option>
                     <option>Woman</option>
                     <option>Alien</option>
                     <option>Cyborg</option>
@@ -83,7 +67,16 @@
                     <option>Elve</option>
                     <option>Troll</option>
                 </select>
-            </div>              
+            </div>
+
+            <div class="input-group">
+                <vue-tags-input
+                v-model="tag"
+                :tags="tags"
+                :autocomplete-items="filteredItems"
+                @tags-changed="newTags => tags = newTags"
+                />
+            </div>             
 
             <div class="input-group">
                 <input type="submit" class="MedievalSharp w-100 rhaegal-bg blanche cursor-pointer hvr-up-min border-radius-14" value="Join Matcha">
@@ -99,22 +92,41 @@
 </template>
 
 <script>
+
+import VueTagsInput from '@johmun/vue-tags-input';
+
 export default {
     name: "Register",
     data(){
         return {
+            tag: '',
+            tags: [],
+            autocompleteItems: [{
+                text: 'Spain',
+            }, {
+                text: 'France',
+            }, {
+                text: 'USA',
+            }, {
+                text: 'Germany',
+            }, {
+                text: 'China',
+            }],
             formdata:{
-                username:'',
-                password:'',
-                email:'',
-                first_name:'',
-                last_name:'',
-                bio:'',
-                age: '',
-                type:''
+                username:'KingRagnar',
+                password:'Lothbrok',
+                email:'ragner@vikings.com',
+                first_name:'Ragnar',
+                last_name:'Lothbrok',
+                bio:'King of Vikings civilisation.',
+                age: '48',
+                type:'male'
             },
             users: []
         }
+    },
+    components: {
+        VueTagsInput,
     },
     methods:{
         async register () {
@@ -126,42 +138,57 @@ export default {
                 last_name: this.formdata.last_name,
                 bio: this.formdata.bio,
                 age: this.formdata.age,
-                type: this.formdata.type
+                type: this.formdata.type,
+                tags: this.tags
             }
-            const baseURI = '/auth/register';
-            try {
-                const res = await this.$api.post(baseURI, {
-                    username : data.username,
-                    password : data.password,
-                    email : data.email,
-                    first_name : data.first_name,
-                    last_name : data.last_name,
-                    bio : data.bio,
-                    age : data.age, 
-                    type : data.type 
-                });
+            console.log(data);
+            console.table(data.tags);
+            // AXIOS BDD
+            // const baseURI = '/auth/register';
+            // try {
+            //     const res = await this.$api.post(baseURI, {
+            //         username : data.username,
+            //         password : data.password,
+            //         email : data.email,
+            //         first_name : data.first_name,
+            //         last_name : data.last_name,
+            //         bio : data.bio,
+            //         age : data.age, 
+            //         type : data.type 
+            //     });
                 
-                // console.log(res);
-                console.log(res);
-                console.log(`HA!`);
+            //     // console.log(res);
+            //     console.log(res);
+            //     console.log(`HA!`);
 
-                //Gestion des erreurs 203
-                if(res.data.error == "joi_error")
-                    alert(res.data.message);
-                else if(res.data.error == "user_already_use")
-                    alert(res.data.message);
-                else if(res.data.error == "email_already_use")
-                    alert(res.data.message);
-                else if(res.data.success == "OK")
-                    this.$router.push('/login');
-            } catch (ex) {
-                console.log(ex);
-            }
+            //     //Gestion des erreurs 203
+            //     if(res.data.error == "joi_error")
+            //         alert(res.data.message);
+            //     else if(res.data.error == "user_already_use")
+            //         alert(res.data.message);
+            //     else if(res.data.error == "email_already_use")
+            //         alert(res.data.message);
+            //     else if(res.data.success == "OK")
+            //         this.$router.push('/login');
+            // } catch (ex) {
+            //     console.log(ex);
+            // }
         }
-    }
+    },
+    computed: {
+        filteredItems() {
+            return this.autocompleteItems.filter(i => {
+            return i.text.toLowerCase().indexOf(this.tag.toLowerCase()) !== -1;
+        });
+    },
+    },
 }
 </script>
 
 <style type="text/css" scoped>
   @import '../../css/reg_log.css';
+   .vue-tags-input .ti-input {
+    padding: 40px 10px!important;
+    transition: border-bottom 200ms ease;
+  }
 </style>

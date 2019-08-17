@@ -27,7 +27,7 @@ export default new Router({
       component: RegisterComp
     },
     {
-      path: '/profile',
+      path: '/profile/:id',
       name: 'ProfileComp',
       component: ProfileComp
     }
