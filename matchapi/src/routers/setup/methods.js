@@ -39,7 +39,7 @@ module.exports = {
         
         let sql =   "CREATE TABLE `interests` ( " +
                     "`id` int PRIMARY KEY NOT NULL AUTO_INCREMENT," +
-                    "`text` varchar(255) NOT NULL," +
+                    "`text` varchar(255) NOT NULL" +
                     ") ENGINE=InnoDB DEFAULT CHARSET=utf8";
 
         req.db.query(sql, (err, results) => {

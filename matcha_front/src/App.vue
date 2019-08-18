@@ -1,7 +1,7 @@
 <template>
   <div id="app">
 
-    <comp-header/>
+    <comp-header :userInfos="this.$store.state.user"/>
     <router-view/>
     <!-- <comp-footer/> -->
 

@@ -12,5 +12,9 @@ module.exports = () => {
     // Create table : users
     router.get('/table_users', methods.table_users);
 
+    //TABLE
+    // Create table : interests
+    router.get('/table_interests', methods.table_interests);
+
     return router;
 }

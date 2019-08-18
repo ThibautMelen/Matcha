@@ -22,13 +22,13 @@
 			</router-link>
 
 			<!-- IF LOG -->
-			<div v-if="userinfo.online" class="account">
-				<p> {{ userinfo.first_name }} </p>
-				<img v-bind:src="userinfo.avatar[0]" alt="avatar">
+			<div v-if="userInfos" class="account">
+				<p> {{ userInfos.first_name }} </p>
+				<img v-bind:src="userInfos.avatar[0]" alt="avatar">
 				<ul>
 					<a @click="gotoprofile()"><li>Profile</li></a>
 					<router-link tag="a" to="/settings"><li>Profile</li></router-link>
-					<a href=""><li>log out</li></a>
+					<a @click="logout()"><li>log out</li></a>
 				</ul>
 			</div>
 			<!-- IF NO LOG -->
@@ -54,10 +54,10 @@
 
 <script>
 export default {
+    props: ['userInfos'],
     name: "Header",
     data(){
         return {
-			userinfo: false,
 			open: false
         }
     },
@@ -69,32 +69,31 @@ export default {
 				
 				console.log(userid);
                 ////////// temporaire /////////////
-                this.userinfo =  {
-                    username: `maggot`,
-                    first_name: `Margot`,
-                    last_name: `Robbie`,
-                    bio: `Margot Elise Robbie is an Australian actress and film producer. She has received nominations.`,
-                    type: `female`,
-                    age: `29`,
-                    online: true,
-                    last_co: `15/08/2019`,
-                    orientation: [`mdrr`, `male`, `female`],
-                    interest: [`cinema`, `fashion`, `pikomit`, `comedy`, `marvel`, `coca cola`], 
-                    avatar: [`https://us.hola.com/imagenes/health-and-beauty/2019080826791/margot-robbie-lash-treatment-mascara-sharon-tate/0-196-115/Margot-Robbie-Lashes-m.jpg?filter=w400`, `https://s1.r29static.com//bin/entry/cd4/720x864,85/2188557/the-touching-way-margot-robbie-2188557.webp`],
-                    liked: true
-                }
+
+                console.log(this.userinfo)
+
+                // this.userinfo = null;
                 //////////////////////////////////
+
+
 			} catch (ex) {
 				console.log(ex);
 			}
 		},
 		async gotoprofile() {
-			console.log(`coucou`);
-			this.$router.push({name: 'ProfileComp', params: {id: 1}});
-		}
+            this.$router.push({name: 'ProfileComp', params: {id: 1}});
+            
+        },
+        logout() {
+            this.$cookies.remove('user_token')
+            this.$store.commit('SET_USER', null)
+            this.$router.push('/login');
+        }
 	},
 	mounted(){
-		this.fetchSglUsers(this.$route.params.id);
+        console.log('yo', this.$store)
+        this.fetchSglUsers(2);
+        // this.fetchSglUsers(this.$router.params.id);
 	}
 }
 </script>

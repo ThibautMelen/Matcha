@@ -61,15 +61,21 @@ export default {
                     password : data.password
                 });
 
-                //Gestion des erreurs 203
-                if(res.data.error == "joi_error")
-                    alert(res.data.message);
-                else if(res.data.error == "user_no")
-                    alert(res.data.message);
-                else if(res.data.error == "pass_no")
-                    alert(res.data.message);
-                else if(res.data.success == "OK")
+                if (res.data.success === 'OK') {
+                    this.$cookies.set('user_token', res.data.token);
+                    this.$store.commit('SET_USER', res.data.userInfos);
                     this.$router.push('/');
+                }
+
+                //Gestion des erreurs 203
+                // if(res.data.error == "joi_error")
+                //     alert(res.data.message);
+                // else if(res.data.error == "user_no")
+                //     alert(res.data.message);
+                // else if(res.data.error == "pass_no")
+                //     alert(res.data.message);
+                // else if(res.data.success == "OK")
+                //     this.$router.push('/');
             } catch (ex) {
                 console.log(ex);
             }

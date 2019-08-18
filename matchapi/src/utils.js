@@ -1,3 +1,7 @@
+const nodemailer = require('nodemailer')
+const jwt = require('jsonwebtoken')
+const util = require('util')
+
 /**
  * Validate a field based on given options
  * 
@@ -15,7 +19,7 @@
 async function validator(field, options = {}) {
 
     if (typeof field === 'undefined') {
-        throw 'Undefined value.'
+        throw `${field} : Undefined value.`
     }
 
     if (options.rules && Array.isArray(options.rules) && options.rules.length > 0) {
@@ -23,28 +27,34 @@ async function validator(field, options = {}) {
             switch (rule) {
                 case 'string':
                     if (typeof field !== 'string') {
-                        throw 'Not string.'
+                        throw `${field} : Not string.`
                     }
+                    break;
                 case 'number':
                     if (typeof field !== 'number') {
-                        throw 'Not number.'
+                        throw `${field} : Not number.`
                     }
+                    break;
                 case 'boolean':
                     if (typeof field !== 'boolean') {
-                        throw 'Not boolean.'
+                        throw `${field} : Not boolean.`
                     }
+                    break;
                 case 'object':
                     if (typeof field !== 'object') {
-                        throw 'Not object.'
+                        throw `${field} : Not object.`
                     }
+                    break;
                 case 'array':
                     if (Array.isArray(field)) {
-                        throw 'Not array.'
+                        throw `${field} : Not array.`
                     }
+                    break;
                 case 'alphanumeric':
                     if (typeof field !== 'string' || !field.match(/^[a-z0-9]+$/i)) {
-                        throw 'Not alphanumeric.'
+                        throw `${field} : Not alphanumeric.`
                     }
+                    break;
             }
         }
     }
@@ -56,10 +66,13 @@ async function validator(field, options = {}) {
             switch (format) {
                 case 'trim':
                     newField = newField.trim()
+                    break;
                 case 'lowercase':
                     newField = newField.toLocaleLowerCase()
+                    break;
                 case 'uppercase':
                     newField = newField.toLocaleUpperCase()
+                    break;
             }
         }
     }
@@ -67,17 +80,17 @@ async function validator(field, options = {}) {
     if (typeof options.min === 'number' && options.min >= 0) {
         if (typeof newField === 'string') {
             if (newField.length < options.min) {
-                throw 'Too short.'
+                throw `${field} : Too short.`
             }
         }
         else if (typeof newField === 'number') {
             if (newField < options.min) {
-                throw 'Too small.'
+                throw `${field} : Too small.`
             }
         }
         else if (Array.isArray(newField)) {
             if (newField < options.min) {
-                throw 'Not enough elements.'
+                throw `${field} : Not enough elements.`
             }
         }
     }
@@ -88,31 +101,71 @@ async function validator(field, options = {}) {
         }
         else if (typeof newField === 'number') {
             if (newField > options.max) {
-                throw 'Too big.'
+                throw `${field} : Too big.`
             }
         }
         else if (Array.isArray(newField)) {
             if (newField > options.max) {
-                throw 'Too much elements.'
+                throw `${field} : Too much elements.`
             }
         }
     }
 
     if (options.enum && Array.isArray(options.enum) && options.enum.length > 0) {
-        if (!options.enum.includes(field)) {
-            throw 'Not allowed value.'
+        if (!options.enum.includes(newField)) {
+            throw `${newField} : Not allowed value.`
         }
     }
 
     if (options.regex && typeof options.regex === 'object' && options.regex.test) {
-        if (!field.match(options.regex)) {
-            throw 'Not matching regex.'
+        if (!newField.match(options.regex)) {
+            throw `${newField} : Not matching regex.`
         }
     }
 
     return newField
 }
 
+
+const devTransporter = nodemailer.createTransport({
+    host: 'mail.protonmail.ch',
+    port: 587,
+    secure: false,
+    auth: {
+        user: 'test.dev.basilic@gmail.com',
+        pass: '&ngland12345SOFIAN'
+    }
+})
+
+const jwt_secret = `grh8ei7ck&{KB*Sysq7WyVH-2n&d`
+
+function createJWTToken(data) {
+    if (typeof data !== 'object') {
+        data = {}
+    }
+
+    const token = jwt.sign(
+        {data: data.sessionData || ''},
+        jwt_secret,
+        {expiresIn: data.maxAge || '7d', algorithm: 'HS256'}
+    )
+
+    return token
+}
+
+async function verifyJWTToken(token) {
+    try {
+        const decodedToken = await util.promisify(jwt.verify)(token, jwt_secret)
+        return decodedToken
+    }
+    catch (err) {
+        throw err
+    }
+}
+
 module.exports = {
-    validator
+    validator,
+    devTransporter,
+    createJWTToken,
+    verifyJWTToken
 };

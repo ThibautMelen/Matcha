@@ -112,6 +112,35 @@ input:focus ~ .highlight {
 }
 
 /*****************************************************************
+	CHECKBOX
+*****************************************************************/
+div#checkbox {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 35px;
+}
+
+div#checkbox label {
+    display: block;
+    position: unset;
+    color: #424242;
+    font-size: 20px;
+}
+
+div#checkbox input {
+    border: unset;
+    background: #fff;
+    width: 40px;
+    height: 40px;
+    margin-right: 5px;
+}
+div#checkbox input[type=checkbox]:checked{
+    background: #01a3a4;
+} 
+
+
+/*****************************************************************
 	TAG STYLE
 *****************************************************************/
  /* style the background and the text color of the input ... */

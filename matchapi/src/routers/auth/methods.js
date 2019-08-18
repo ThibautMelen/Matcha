@@ -6,13 +6,52 @@ const utils = require('../../utils');
 const saltRounds = 10;
 
 module.exports = {
+    verify: async (req, res) => {
+        if (req.cookies.user_token) {
+            try {
+                const decodedToken = await utils.verifyJWTToken(req.cookies.user_token)
+
+                const data = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users WHERE id = ?', decodedToken.data.id)
+
+                if (data[0]) {
+                    let userInfos =  {
+                        id: data[0].id,
+                        username: data[0].username,
+                        first_name: data[0].first_name,
+                        last_name: data[0].last_name,
+                        bio: data[0].bio,
+                        type: data[0].type,
+                        age: data[0].age,
+                        last_co: `15/08/2019`,
+                        sexual_orientations: data[0].sexual_orientations,
+                        interest: data[0].interest, 
+                        avatar: [`https://us.hola.com/imagenes/health-and-beauty/2019080826791/margot-robbie-lash-treatment-mascara-sharon-tate/0-196-115/Margot-Robbie-Lashes-m.jpg?filter=w400`, `https://s1.r29static.com//bin/entry/cd4/720x864,85/2188557/the-touching-way-margot-robbie-2188557.webp`],
+                        liked: true
+                    }
+
+                    res.status(200).json({success: true, userInfos})
+                }
+                else {
+                    res.status(200).json({success: false})
+                }
+            } catch(ex) {
+                res.status(200).json({success: false})
+            }
+        }
+        else {
+            res.status(200).json({success: false})
+        }
+    },
+
     login: async (req, res) => {
+
+        console.log(req.body)
 
         let body;
         try {
             body = {
-                username: await utils.validator(req.body.username, {rules: ['string'], format: ['trim', 'lowercase']}),
-                password: await utils.validator(req.body.password, {rules: ['string'], format: ['trim']})
+                username: await utils.validator(req.body.username, {rules: ['string'], formats: ['trim', 'lowercase']}),
+                password: await utils.validator(req.body.password, {rules: ['string'], formats: ['trim']})
             }
         } catch (err) {
             return res.status(400).json({error: 'invalid_data', message: err});
@@ -20,7 +59,7 @@ module.exports = {
 
         // INSERT
         try {
-            req.db.query("SELECT pass FROM users WHERE username = ?", body.username, async (err, data) => {
+            req.db.query("SELECT * FROM users WHERE username = ?", body.username, async (err, data) => {
                 
                 if (err) return res.status(500).json({ error: 'SQL ERROR' });
                 if(!data[0])
@@ -30,7 +69,28 @@ module.exports = {
                 if (!res_pass)
                     return res.status(203).json({error: 'pass_no', message: `This pass don't work`});
 
-                res.status(200).json({ success: 'OK' });
+                const data_token = {
+                    id: data[0].id
+                }
+
+                const token = await utils.createJWTToken({sessionData: data_token, maxAge: '14d'})
+
+                let userInfos =  {
+                    id: data[0].id,
+                    username: data[0].username,
+                    first_name: data[0].first_name,
+                    last_name: data[0].last_name,
+                    bio: data[0].bio,
+                    type: data[0].type,
+                    age: data[0].age,
+                    last_co: `15/08/2019`,
+                    sexual_orientations: data[0].sexual_orientations,
+                    interest: data[0].interest, 
+                    avatar: [`https://us.hola.com/imagenes/health-and-beauty/2019080826791/margot-robbie-lash-treatment-mascara-sharon-tate/0-196-115/Margot-Robbie-Lashes-m.jpg?filter=w400`, `https://s1.r29static.com//bin/entry/cd4/720x864,85/2188557/the-touching-way-margot-robbie-2188557.webp`],
+                    liked: true
+                }
+
+                res.status(200).json({ success: 'OK', token, userInfos });
             });
         } catch(ex) {
             return res.status(520).json({ error: 'Unknown error 0000' });
@@ -39,36 +99,32 @@ module.exports = {
 
     register: async (req, res) => {
 
+        console.log(req.body)
+
         let body;
         try {
             body = {
-                username: await utils.validator(req.body.username, {rules: ['string'], format: ['trim', 'lowercase']}),
-                password: await utils.validator(req.body.username, {rules: ['string'], format: ['trim']}),
-
-                username: await utils.validator(req.body.username, {rules: ['string', 'alphanumeric'], format: ['trim', 'lowercase'], min: 4, max: 15}),
-                password: await utils.validator(req.body.password, {rules: ['string'], regex: /^[a-zA-Z0-9]{8,}$/, format: ['trim'], max: 255}),
-                email: await utils.validator(req.body.email, {rules: ['string'], regex: /^[^\W][a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)*\@[a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)*\.[a-zA-Z]{2,4}$/, format: ['trim'], max: 255}),
-                first_name: await utils.validator(req.body.first_name, {rules: ['string'], format: ['trim'], min: 2, max: 25}),
-                last_name: await utils.validator(req.body.last_name, {rules: ['string'], format: ['trim'], min: 2, max: 25}),
-                bio: await utils.validator(req.body.last_name, {rules: ['string'], format: ['trim'], min: 10, max: 100}),
-                age: await utils.validator(req.body.last_name, {rules: ['number'], min: 16}),
-                type: await utils.validator(req.body.last_name, {rules: ['string'], format: ['trim', 'lowercase'], enum: ['male','woman','alien','cyborg','giant','minks','elve','troll']}),
+                username: await utils.validator(req.body.username, {rules: ['string', 'alphanumeric'], formats: ['trim', 'lowercase'], min: 4, max: 15}),
+                password: await utils.validator(req.body.password, {rules: ['string'], regex: /^[a-zA-Z0-9]{8,}$/, formats: ['trim'], max: 255}),
+                email: await utils.validator(req.body.email, {rules: ['string'], regex: /^[^\W][a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)*\@[a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)*\.[a-zA-Z]{2,4}$/, formats: ['trim'], max: 255}),
+                first_name: await utils.validator(req.body.first_name, {rules: ['string'], formats: ['trim'], min: 2, max: 25}),
+                last_name: await utils.validator(req.body.last_name, {rules: ['string'], formats: ['trim'], min: 2, max: 25}),
+                bio: await utils.validator(req.body.bio, {rules: ['string'], formats: ['trim'], min: 10, max: 100}),
+                age: await utils.validator(req.body.age, {rules: ['number'], min: 16}),
+                type: await utils.validator(req.body.type, {rules: ['string'], formats: ['trim', 'lowercase'], enum: ['male','woman','alien','cyborg','giant','minks','elve','troll']}),
                 // profile_pics: await utils.validator(req.body.profile_pics, {rules: ['array'], min: 1, max: 5}),
-                lat: utils.validator(req.body.lat, {rules: ['number']}),
-                lng: utils.validator(req.body.lng, {rules: ['number']}),
-                interests: await utils.validator(req.body.interests, {rules: ['array'], min: 0, max: 255}),
-                sexual_orientations: await utils.validator(req.body.interests, {rules: ['array'], min: 1, max: 255}),
+                lat: await utils.validator(req.body.lat, {rules: ['number']}),
+                lng: await utils.validator(req.body.lng, {rules: ['number']}),
+                interests: await utils.validator(req.body.interests, {rules: [], min: 0, max: 255}),
+                sexual_orientations: await utils.validator(req.body.sexual_orientations, {rules: [], min: 1, max: 255}),
             }
         } catch (err) {
-            return res.status(203).json({error: 'joi_error', message: err});
+            return res.status(203).json({error: 'validation_error', message: err});
         }
-
-        console.log(body);
         //utiliser une function utils
         // utils.oui();
 
         // Username it's free ?
-
         try {
             const data = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users WHERE username = ?', body.username);
             if(data[0])
@@ -118,12 +174,18 @@ module.exports = {
             await util.promisify(req.db.query).bind(req.db)('INSERT INTO users SET ?', inserts);
             res.status(200).json({ success: 'OK' });
 
-            for (let interest of interests) {
-                await util.promisify(req.db.query).bind(req.db)('INSERT INTO interests SET ? WHERE NOT EXISTS (SELECT text FROM interests WHERE text = ?);', interest, interest.text);
-            }
         } catch(err) {
             console.error(err)
             return res.status(520).json({ error: 'Unknown error 0004' });
+        }
+
+        try {
+            for (let interest of body.interests) {
+                await util.promisify(req.db.query).bind(req.db)('INSERT INTO interests (text) SELECT * FROM (SELECT ?) AS tmp WHERE NOT EXISTS ( SELECT text FROM interests WHERE text = ? ) LIMIT 1;', [interest.text, interest.text]);
+            }
+        } catch(err) {
+            console.error(err)
+            return res.status(520).json({ error: 'Unknown error 0005' });
         }
     }
 }

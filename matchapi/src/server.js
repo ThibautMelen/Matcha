@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const parser = require('body-parser');
 const mysql = require('mysql');
+const cookieParser = require('cookie-parser');
 
 const setupRouter = require('./routers/setup/routes');
 const authRouter = require('./routers/auth/routes');
@@ -22,7 +23,25 @@ module.exports = class Server {
         // Middlewares
         this.app.use(parser.urlencoded({ extended: true }));
         this.app.use(parser.json());
-        this.app.use(cors());
+
+        const allowedOrigins = [ 'http://localhost:8080' ]
+        this.app.use(cors({
+            origin: (origin, callback) => {
+            // Allow requests with no origin
+            if (!origin) {
+                return callback(null, true)
+            }
+            if(allowedOrigins.indexOf(origin) === -1) {
+              var msg = 'The CORS policy for this site does not allow access from the specified Origin.'
+              return callback(new Error(msg), false)
+            }
+        
+            return callback(null, true)
+          },
+          credentials: true
+        }))
+
+        this.app.use(cookieParser());
         this.app.use((req, res, next) => {
             req.db = this.db;
             next();

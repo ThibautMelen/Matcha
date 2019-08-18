@@ -69,14 +69,34 @@
                 </select>
             </div>
 
+            <div id="checkbox">
+                <p>You here for :</p>
+                <input type="checkbox" id="male" value="Male" v-model="formdata.sexual_orientations">
+                <label for="male">Male</label>
+                <input type="checkbox" id="woman" value="Woman" v-model="formdata.sexual_orientations">
+                <label for="woman">Woman</label>
+                <input type="checkbox" id="alien" value="Alien" v-model="formdata.sexual_orientations">
+                <label for="alien">Alien</label>
+                <input type="checkbox" id="cyborg" value="Cyborg" v-model="formdata.sexual_orientations">
+                <label for="cyborg">Cyborg</label>
+                <input type="checkbox" id="giant" value="Giant" v-model="formdata.sexual_orientations">
+                <label for="giant">Giant</label>
+                <input type="checkbox" id="minks" value="Minks" v-model="formdata.sexual_orientations">
+                <label for="minks">Minks</label>
+                <input type="checkbox" id="elve" value="Elve" v-model="formdata.sexual_orientations">
+                <label for="elve">Elve</label>
+                <input type="checkbox" id="troll" value="Troll" v-model="formdata.sexual_orientations">
+                <label for="troll">Troll</label>
+            </div>
+
             <div class="input-group">
                 <vue-tags-input
-                v-model="tag"
-                :tags="tags"
+                v-model="formdata.tag"
+                :tags="formdata.tags"
                 :autocomplete-items="filteredItems"
                 @tags-changed="newTags => tags = newTags"
                 />
-            </div>             
+            </div>
 
             <div class="input-group">
                 <input type="submit" class="MedievalSharp w-100 rhaegal-bg blanche cursor-pointer hvr-up-min border-radius-14" value="Join Matcha">
@@ -99,8 +119,6 @@ export default {
     name: "Register",
     data(){
         return {
-            tag: '',
-            tags: [],
             autocompleteItems: [{
                 text: 'Spain',
             }, {
@@ -119,8 +137,11 @@ export default {
                 first_name:'Ragnar',
                 last_name:'Lothbrok',
                 bio:'King of Vikings civilisation.',
-                age: '48',
-                type:'male'
+                age: '78',
+                type:'male',
+                tag: '',
+                tags: [],
+                sexual_orientations: []
             },
             users: []
         }
@@ -137,48 +158,42 @@ export default {
                 first_name: this.formdata.first_name,
                 last_name: this.formdata.last_name,
                 bio: this.formdata.bio,
-                age: this.formdata.age,
+                age: parseInt(this.formdata.age),
                 type: this.formdata.type,
-                tags: this.tags
+                interests: this.tags.map(v => ({text: v.text})),
+                sexual_orientations: this.formdata.sexual_orientations,
+                lng: parseFloat(0),
+                lat: parseFloat(0)
             }
             console.log(data);
-            console.table(data.tags);
+            console.table(data.interests);
             // AXIOS BDD
-            // const baseURI = '/auth/register';
-            // try {
-            //     const res = await this.$api.post(baseURI, {
-            //         username : data.username,
-            //         password : data.password,
-            //         email : data.email,
-            //         first_name : data.first_name,
-            //         last_name : data.last_name,
-            //         bio : data.bio,
-            //         age : data.age, 
-            //         type : data.type 
-            //     });
-                
-            //     // console.log(res);
-            //     console.log(res);
-            //     console.log(`HA!`);
+            const baseURI = '/auth/register';
+            try {
+                const res = await this.$api.post(baseURI, data);
 
-            //     //Gestion des erreurs 203
-            //     if(res.data.error == "joi_error")
-            //         alert(res.data.message);
-            //     else if(res.data.error == "user_already_use")
-            //         alert(res.data.message);
-            //     else if(res.data.error == "email_already_use")
-            //         alert(res.data.message);
-            //     else if(res.data.success == "OK")
-            //         this.$router.push('/login');
-            // } catch (ex) {
-            //     console.log(ex);
-            // }
-        }
+                console.log(res.data);
+                console.log(res.status);
+
+                //Gestion des erreurs 203
+                // if(res.data.error == "joi_error")
+                //     alert(res.data.message);
+                // else if(res.data.error == "user_already_use")
+                //     alert(res.data.message);
+                // else if(res.data.error == "email_already_use")
+                //     alert(res.data.message);
+                // else if(res.data.success == "OK")
+                //     this.$router.push('/login');
+            } catch (ex) {
+                console.log(ex);
+            }
+        },
     },
     computed: {
         filteredItems() {
             return this.autocompleteItems.filter(i => {
-            return i.text.toLowerCase().indexOf(this.tag.toLowerCase()) !== -1;
+            return i.text.toLowerCase().indexOf(this.formdata.tag.toLowerCase()) !== -1;
+            a
         });
     },
     },
