@@ -1,5 +1,8 @@
 const express = require('express');
-const methods = require('./methods')
+const methods = require('./methods');
+const multer  = require('multer');
+
+const upload = multer({ dest: 'uploads/' });
 
 module.exports = () => {
     const router = new express.Router();
@@ -16,8 +19,13 @@ module.exports = () => {
     // Select ALL users
     router.get('/all', methods.all);
 
+    // Select all interests
+    router.get('/interests', methods.interests);
+
     // Select ONE users
     router.get('/:id', methods.getOne);
 
+    // Upload image
+    router.post('/image', upload.single('file'), methods.image);
     return router;
 };

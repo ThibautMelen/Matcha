@@ -251,7 +251,7 @@ section form select {
     height: 55px;
 }
 
-nput[type="file"] {
+input[type="file"] {
     color: transparent;
     padding: 0;
     margin-bottom: 0;

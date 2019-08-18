@@ -23,6 +23,7 @@ module.exports = class Server {
         // Middlewares
         this.app.use(parser.urlencoded({ extended: true }));
         this.app.use(parser.json());
+        this.app.use('/public', express.static('public'));
 
         const allowedOrigins = [ 'http://localhost:8080' ]
         this.app.use(cors({

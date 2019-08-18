@@ -1,10 +1,10 @@
 <template>
 
-    <!-- REGISTER -->
-    <section id="sect">
-        <form @submit.prevent="register()">
+    <!-- SETTINGS -->
+    <section v-if="this.$store.state.user" id="sect">
+        <form @submit.prevent="settings()">
             
-            <h1>Join Matcha</h1>
+            <h1>Settings : {{ this.$store.state.user.username }}</h1>
 
             <div class="input-group">      
                 <input v-model="formdata.username" type="text" required>
@@ -116,13 +116,13 @@
             </div>
 
             <div class="input-group">
-                <input type="submit" value="Join Matcha">
+                <input type="submit" value="Update Info">
             </div>
 
         </form>
     </section>
-
 </template>
+
 
 <script>
 
@@ -130,23 +130,24 @@ import VueTagsInput from '@johmun/vue-tags-input';
 import VueUploadMultipleImage from 'vue-upload-multiple-image'
 
 export default {
-    name: "Register",
+    name: "Setting",
     data(){
+        console.log('this.$store.state.user', this.$store.state.user)
         return {
             formdata:{
-                username:'',
+                username: this.$store.state.user ? this.$store.state.user.username : '',
                 password:'',
-                email:'',
-                first_name:'',
-                last_name:'',
-                bio:'',
-                age: '',
-                type:'',
-                sexual_orientations: [],
-                tags: [],
+                email: this.$store.state.user ? this.$store.state.user.email : '',
+                first_name: this.$store.state.user ? this.$store.state.user.first_name : '',
+                last_name: this.$store.state.user ? this.$store.state.user.last_name : '',
+                bio: this.$store.state.user ? this.$store.state.user.bio : '',
+                age: this.$store.state.user ? this.$store.state.user.age : '',
+                type: this.$store.state.user ? this.$store.state.user.type : '',
+                sexual_orientations: this.$store.state.user ? this.$store.state.user.sexual_orientations : [],
+                tags: this.$store.state.user ? this.$store.state.user.interests : [],
                 tag: '',
             },
-            tags: [],
+            tags: this.$store.state.user ? this.$store.state.user.interests : [],
             tag: '',
             images: [],
             profile_pics: [],
@@ -159,7 +160,7 @@ export default {
         VueUploadMultipleImage,
     },
     methods:{
-        async register () {
+        async settings () {
             if (this.uploading_image) {
                 alert('Please wait, image is uploading')
                 return
@@ -254,11 +255,13 @@ export default {
         },
     },
     mounted() {
-        this.fetchInterest();
+        this.fetchInterest();        
     },
 
 }
 </script>
+
+
 
 <style type="text/css" scoped>
   @import '../../css/reg_log.css';

@@ -1,4 +1,6 @@
 <template>
+
+    <!-- LOGIN -->
     <section id="sect">
         <form @submit.prevent="login()">
             <h1>Welcom back on Matcha !</h1>
@@ -68,14 +70,16 @@ export default {
                 }
 
                 //Gestion des erreurs 203
-                // if(res.data.error == "joi_error")
-                //     alert(res.data.message);
-                // else if(res.data.error == "user_no")
-                //     alert(res.data.message);
-                // else if(res.data.error == "pass_no")
-                //     alert(res.data.message);
-                // else if(res.data.success == "OK")
-                //     this.$router.push('/');
+                if(res.data.error == "email_no")
+                    alert(res.data.message);
+                else if(res.data.error == "invalid_data")
+                    alert(res.data.message);
+                else if(res.data.error == "user_no")
+                    alert(res.data.message);
+                else if(res.data.error == "pass_no")
+                    alert(res.data.message);
+                else if(res.data.success == "OK")
+                    this.$router.push('/');
             } catch (ex) {
                 console.log(ex);
             }
@@ -91,20 +95,6 @@ export default {
         //         this.users = res.data;
         //     } catch (ex) {
         //         console.log(ex);
-        //     }
-        // }
-
-        // // FETCH ONE SINGLE USER
-        // async fetchUsers () {
-        //     console.log(`mdrrr`);
-        //     const baseURI = '/user/2'
-            
-        //     try {
-        //         const res = await this.$api.get(baseURI);
-        //         console.log(res.data)
-        //         this.users = [ res.data ];
-        //     } catch (ex) {
-        //         console.log(ex)
         //     }
         // }
     }

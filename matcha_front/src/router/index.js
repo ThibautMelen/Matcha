@@ -5,11 +5,14 @@ import LoginComp from '@/components/auth/Login.vue';
 import RegisterComp from '@/components/auth/Register.vue';
 import HomeComp from '@/components/basic/Home.vue';
 import ProfileComp from '@/components/user/Profile.vue';
+import SettingsComp from '@/components/user/Settings.vue';
+import store from '../store'
 
 Vue.use(Router)
 
 export default new Router({
   mode: 'history',
+  props: ['userInfos'],
   routes: [
     {
       path: '/',
@@ -30,6 +33,12 @@ export default new Router({
       path: '/profile/:id',
       name: 'ProfileComp',
       component: ProfileComp
+    },
+    {
+      path: '/settings',
+      name: 'SettingsComp',
+      component: SettingsComp,
+      
     }
   ]
 })

@@ -11,6 +11,8 @@ module.exports = () => {
     
     router.post('/register', methods.register);
 
+    router.get('/validate/:key', methods.validate);
+
 
     return router;
 };

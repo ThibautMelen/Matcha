@@ -17,7 +17,7 @@
 
 
         <div v-if="userinfo" id="left">
-			<img v-if="userinfo.avatar" v-bind:src="userinfo.avatar[0]" alt="avatar">
+			<img v-if="userinfo.profile_pics" v-bind:src="`http://localhost:3000/${userinfo.profile_pics[0]}`" alt="avatar">
             <button v-if="profilelike == 0" @click="like()" style="background-color: #ed5673">Like</button>
             <button v-if="profilelike == 1" @click="likeback()" style="background-color: #f368e0">Like back</button>
             <button v-if="profilelike == 2" @click="likemove()" style="background-color: #10ac84">Remove Like</button>
@@ -29,16 +29,16 @@
             <h3 v-else><i>{{ userinfo.username }} · {{userinfo.last_co}}</i></h3>
             <h2>{{ userinfo.type }} - {{ userinfo.age }} <b>years old</b></h2>
             <h4>{{ userinfo.first_name }} search
-                <div v-if="userinfo.orientation">
-                    <span v-for="(item, index) in userinfo.orientation" :key="item">
-                        {{ item }}<span v-if="(index + 2) < userinfo.orientation.length">, </span><span v-if="(index + 2) == userinfo.orientation.length"> & </span>
+                <div v-if="userinfo.sexual_orientations">
+                    <span v-for="(item, index) in userinfo.sexual_orientations" :key="item">
+                        {{ item }}<span v-if="(index + 2) < userinfo.sexual_orientations.length">, </span><span v-if="(index + 2) == userinfo.sexual_orientations.length"> {{`&`}} </span>
                     </span>.
                 </div>
             </h4>
             <h4>{{ userinfo.first_name }} like
-                <div v-if="userinfo.interest" >
-                    <span v-for="(item, index) in userinfo.interest" :key="item">
-                        {{ item }}<span v-if="(index + 2) < userinfo.interest.length">, </span><span v-if="(index + 2) == userinfo.interest.length"> & </span>
+                <div v-if="userinfo.interests" >
+                    <span v-for="(item, index) in userinfo.interests" :key="item">
+                        {{ item }}<span v-if="(index + 2) < userinfo.interests.length">, </span><span v-if="(index + 2) == userinfo.interests.length"> {{`&`}} </span>
                     </span>.
                 </div>
             </h4>
@@ -68,27 +68,10 @@ export default {
     methods:{
 		async fetchSglUsers(userid) {
 			try {
-                // const res = await this.$api.get('/user/all/1');
-                // this.userinfo = res.data;
+                const res = await this.$api.get(`/user/${userid}`);
+                this.userinfo = res.data;
+                console.log(this.userinfo)
                
-               console.log(userid);
-                ////////// temporaire /////////////
-                this.userinfo =  {
-                    username: `maggot`,
-                    first_name: `Margot`,
-                    last_name: `Robbie`,
-                    bio: `Margot Elise Robbie is an Australian actress and film producer. She has received nominations.`,
-                    type: `female`,
-                    age: `29`,
-                    online: true,
-                    last_co: `15/08/2019`,
-                    orientation: [`mdrr`, `male`, `female`],
-                    interest: [`cinema`, `fashion`, `pikomit`, `comedy`, `marvel`, `coca cola`], 
-                    avatar: [`https://us.hola.com/imagenes/health-and-beauty/2019080826791/margot-robbie-lash-treatment-mascara-sharon-tate/0-196-115/Margot-Robbie-Lashes-m.jpg?filter=w400`, `https://s1.r29static.com//bin/entry/cd4/720x864,85/2188557/the-touching-way-margot-robbie-2188557.webp`],
-                    liked: true
-                }
-                //////////////////////////////////
-
                 if (this.userinfo.liked)
                     this.profilelike = 1;
 			} catch (ex) {

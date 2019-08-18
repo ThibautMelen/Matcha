@@ -1,8 +1,8 @@
 <template>
   <div id="app">
 
-    <comp-header :userInfos="this.$store.state.user"/>
-    <router-view/>
+    <comp-header v-if="!this.$store.state.loading" :userInfos="this.$store.state.user"/>
+    <router-view v-if="!this.$store.state.loading" :userInfos="this.$store.state.user"/>
     <!-- <comp-footer/> -->
 
   </div>

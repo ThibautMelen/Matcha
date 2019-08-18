@@ -6,10 +6,9 @@ import router from './router'
 import axios from "axios";
 import VueCookies from 'vue-cookies'
 import Chat from 'vue-beautiful-chat'
-import Vuex from 'vuex';
+import store from './store'
 
 Vue.use(VueCookies)
-Vue.use(Vuex)
 Vue.use(Chat)
 
 Vue.config.productionTip = false
@@ -23,43 +22,7 @@ Vue.use({
   }
 })
 
-//VUE X
-const store = new Vuex.Store({
-  state: {
-    user: null
-  },
-  mutations: {
-    SET_USER (state, user) {
-      state.user = user
-    }
-  }
-})
-
 const token = VueCookies.get('user_token')
-
-console.log(token)
-
-if (token) {
-  axios.get('http://localhost:3000/auth/verify', {withCredentials: true})
-  .then(res => {
-    if (res.data.userInfos) {
-      console.log(res.data.userInfos)
-      store.commit('SET_USER', res.data.userInfos)
-    }
-    else {
-      store.commit('SET_USER', null)
-      VueCookies.remove('user_token')
-    }
-  })
-  .catch(err => {
-    console.error(err)
-    store.commit('SET_USER', null)
-    VueCookies.remove('user_token')
-  })
-}
-else {
-  store.commit('SET_USER', null)
-}
 
 /* eslint-disable no-new */
 new Vue({
@@ -67,5 +30,31 @@ new Vue({
   store,
   router,
   components: { App },
-  template: '<App/>'
+  template: '<App/>',
+  mounted() {
+    if (token) {
+      axios.get('http://localhost:3000/auth/verify', {withCredentials: true})
+      .then(res => {
+        if (res.data.userInfos) {
+          store.commit('SET_USER', res.data.userInfos)
+          store.commit('SET_LOADING', false)
+        }
+        else {
+          store.commit('SET_USER', null)
+          store.commit('SET_LOADING', false)
+          VueCookies.remove('user_token')
+        }
+      })
+      .catch(err => {
+        console.error(err)
+        store.commit('SET_USER', null)
+        store.commit('SET_LOADING', false)
+        VueCookies.remove('user_token')
+      })
+    }
+    else {
+      store.commit('SET_USER', null)
+      store.commit('SET_LOADING', false)
+    }
+  },
 })

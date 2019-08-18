@@ -24,6 +24,7 @@ module.exports = {
                     "`lat` int(11)," +
                     "`lng` int(11)," +
                     "`interests` varchar(255) NOT NULL," +
+                    "`profile_pics` varchar(255) NOT NULL," +
                     "`sexual_orientations` varchar(255) NOT NULL," +
                     "`confirm` int(11) NOT NULL" +
                     ") ENGINE=InnoDB DEFAULT CHARSET=utf8";

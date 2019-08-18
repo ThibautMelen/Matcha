@@ -23,16 +23,16 @@
 
 			<!-- IF LOG -->
 			<div v-if="userInfos" class="account">
-				<p> {{ userInfos.first_name }} </p>
-				<img v-bind:src="userInfos.avatar[0]" alt="avatar">
+				<p> {{ userInfos.username }} </p>
+				<img v-bind:src="`http://localhost:3000/${userInfos.profile_pics[0]}`" alt="avatar">
 				<ul>
 					<a @click="gotoprofile()"><li>Profile</li></a>
-					<router-link tag="a" to="/settings"><li>Profile</li></router-link>
+					<router-link tag="a" to="/settings"><li>Settings</li></router-link>
 					<a @click="logout()"><li>log out</li></a>
 				</ul>
 			</div>
 			<!-- IF NO LOG -->
-			<div  v-else class="reg-log">
+			<div v-else class="reg-log">
 				<router-link tag="a" to="/login/">login</router-link>
 				<router-link tag="a" to="/register">register</router-link>
 			</div>
@@ -44,7 +44,7 @@
 			<ul class="menu">
 				<router-link v-on:click.native="open = !open" tag="a" to="/"><li v-bind:style= "this.$route.path === '/' ? 'color: #01a3a4' : 'color: #fff'">Home</li></router-link>
 				<router-link v-on:click.native="open = !open" tag="a" to="/login"><li v-bind:style= "this.$route.path === '/x' ? 'color: #01a3a4' : 'color: #fff'">Autre page</li></router-link>
-				<a @click="open = !open" href="https://twitter.com/intent/tweet?text=Join Camagru 😋" target="_blank"><li>Partager</li></a>
+				<a @click="open = !open" href="https://twitter.com/intent/tweet?text=Join Matcha 😋" target="_blank"><li>Partager</li></a>
 			</ul>
 		</nav>
     </section>
@@ -54,35 +54,16 @@
 
 <script>
 export default {
-    props: ['userInfos'],
     name: "Header",
+    props: ['userInfos'],
     data(){
         return {
 			open: false
         }
     },
     methods:{
-		async fetchSglUsers(userid) {
-			try {
-                // const res = await this.$api.get('/user/all/1');
-                // this.userinfo = res.data;
-				
-				console.log(userid);
-                ////////// temporaire /////////////
-
-                console.log(this.userinfo)
-
-                // this.userinfo = null;
-                //////////////////////////////////
-
-
-			} catch (ex) {
-				console.log(ex);
-			}
-		},
-		async gotoprofile() {
-            this.$router.push({name: 'ProfileComp', params: {id: 1}});
-            
+		gotoprofile() {
+            this.$router.push({name: 'ProfileComp', params: {id: this.$store.state.user.id}});
         },
         logout() {
             this.$cookies.remove('user_token')
@@ -91,9 +72,6 @@ export default {
         }
 	},
 	mounted(){
-        console.log('yo', this.$store)
-        this.fetchSglUsers(2);
-        // this.fetchSglUsers(this.$router.params.id);
 	}
 }
 </script>

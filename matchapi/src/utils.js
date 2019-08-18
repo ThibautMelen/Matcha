@@ -46,7 +46,7 @@ async function validator(field, options = {}) {
                     }
                     break;
                 case 'array':
-                    if (Array.isArray(field)) {
+                    if (!Array.isArray(field)) {
                         throw `${field} : Not array.`
                     }
                     break;
@@ -127,10 +127,8 @@ async function validator(field, options = {}) {
 }
 
 
-const devTransporter = nodemailer.createTransport({
-    host: 'mail.protonmail.ch',
-    port: 587,
-    secure: false,
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
     auth: {
         user: 'test.dev.basilic@gmail.com',
         pass: '&ngland12345SOFIAN'
@@ -165,7 +163,7 @@ async function verifyJWTToken(token) {
 
 module.exports = {
     validator,
-    devTransporter,
+    transporter,
     createJWTToken,
     verifyJWTToken
 };
