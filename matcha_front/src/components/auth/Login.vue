@@ -51,6 +51,7 @@ export default {
         }
     },
     methods:{
+        //LOGIN FORM
         async login () {
             let data = {    
                 username: this.formdata.username,    
@@ -84,19 +85,15 @@ export default {
                 console.log(ex);
             }
         },
-
-        // FETCH ALL USER
-        // async fetchUsers () {
-        //     console.log(`mdrrr`);
-        //     const baseURI = '/user/all?salut=coucou';
-            
-        //     try {
-        //         const res = await this.$api.get(baseURI, { salut: 'coucou' });
-        //         this.users = res.data;
-        //     } catch (ex) {
-        //         console.log(ex);
-        //     }
-        // }
+        //CHECK IF AUTHORIZED TO ACCESS PAGE
+        checkCo(){
+            if(this.$store.state.user) {
+                this.$router.push('/');
+            }
+        }
+    },
+    mounted() {
+        this.checkCo();
     }
 }
 </script>

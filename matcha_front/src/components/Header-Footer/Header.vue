@@ -54,7 +54,6 @@
 
 <script>
 export default {
-    name: "Header",
     props: ['userInfos'],
     data(){
         return {

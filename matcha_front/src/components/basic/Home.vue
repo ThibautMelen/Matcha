@@ -66,7 +66,6 @@ const INTERACT_DRAGGED_RIGHT = "INTERACT_DRAGGED_RIGHT";
 const INTERACT_DRAGGED_UP = "INTERACT_DRAGGED_UP";
 
 export default {
-    name: "Home",
     data () {
         return {
             isVisible: true,

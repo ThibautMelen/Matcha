@@ -130,9 +130,7 @@ import VueTagsInput from '@johmun/vue-tags-input';
 import VueUploadMultipleImage from 'vue-upload-multiple-image'
 
 export default {
-    name: "Setting",
     data(){
-        console.log('this.$store.state.user', this.$store.state.user)
         return {
             formdata:{
                 username: this.$store.state.user ? this.$store.state.user.username : '',
@@ -160,6 +158,7 @@ export default {
         VueUploadMultipleImage,
     },
     methods:{
+        //UPDATE NEW SETTINGS
         async settings () {
             if (this.uploading_image) {
                 alert('Please wait, image is uploading')
@@ -204,6 +203,21 @@ export default {
                 console.log(ex);
             }
         },
+        //FETCH INTERESET
+        async fetchInterest () {
+            try {
+                const res = await this.$api.get('/user/interests');
+                this.autocompleteItems = res.data.interests;
+            } catch (ex) {
+                console.log(ex);
+            }
+        },
+        //CHECK IF AUTHORIZED TO ACCESS PAGE
+        checkCo(){
+            if(!this.$store.state.user) {
+                this.$router.push('/login');
+            }
+        },
         //UPLOAD IMAGE
         uploadImageSuccess(formData, index, fileList) {
             this.uploading_image = true
@@ -238,14 +252,7 @@ export default {
         dataChange (data) {
             console.log(data)
         },
-        async fetchInterest () {
-            try {
-                const res = await this.$api.get('/user/interests');
-                this.autocompleteItems = res.data.interests;
-            } catch (ex) {
-                console.log(ex);
-            }
-        }
+
     },
     computed: {
         filteredItems() {
@@ -255,7 +262,8 @@ export default {
         },
     },
     mounted() {
-        this.fetchInterest();        
+        this.fetchInterest();
+        this.checkCo();
     },
 
 }
