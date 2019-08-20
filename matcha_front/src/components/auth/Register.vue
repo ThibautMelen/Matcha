@@ -130,7 +130,6 @@ import VueTagsInput from '@johmun/vue-tags-input';
 import VueUploadMultipleImage from 'vue-upload-multiple-image'
 
 export default {
-    name: "Register",
     data(){
         return {
             formdata:{

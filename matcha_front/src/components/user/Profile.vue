@@ -2,7 +2,7 @@
     <section id="profil">
 
         <div v-if="userinfo" id="left">
-			<img v-if="userinfo.profile_pics" v-bind:src="`http://localhost:3000/${userinfo.profile_pics[0]}`" alt="avatar">
+			<img v-if="userinfo.profile_pics" v-bind:src="`http://localhost:3000/${userinfo.profile_pics[imgNb]}`" @click="nextImg()" alt="avatar">
             <div v-if="this.$store.state.user && this.$store.state.user.id !== userinfo.id">
                 <button v-if="this.$store.state.user.likes && this.$store.state.user.likes.includes(userinfo.id.toString())" @click="likeRemove()" style="background-color: #ed5673">Remove Like</button>
                 <button v-else-if="!userinfo.likes || !userinfo.likes.includes(this.$store.state.user.id)" @click="like()" style="background-color: #10ac84">Like</button>
@@ -41,11 +41,11 @@ export default {
     data(){
         return {
             userinfo: false,
-            profilelike: 0 //like = 0 | likeback = 1 | likemove = 2
+            imgNb: 0
         }
     },
     methods:{
-        //USER PAGE INFO
+        //GET USER PAGE INFO
 		async fetchSglUsers(userid) {
 			try {
                 const res = await this.$api.get(`/user/${userid}`);
@@ -92,6 +92,14 @@ export default {
                 alert('Server error.')
 				console.log(ex)
 			}  
+        },
+        //NEXT IMG PROFILE
+        nextImg(){
+            if((this.imgNb + 1) < this.userinfo.profile_pics.length)
+                this.imgNb += 1;
+            else
+                this.imgNb = 0;
+            console.log(this.imgNb);
         }
     },
 	mounted(){
@@ -131,6 +139,7 @@ section#profil div#left img {
     width: 200px;
     height: 200px;
     border-radius: 70px;
+    cursor: pointer;
 }
 
 section#profil div#left button {

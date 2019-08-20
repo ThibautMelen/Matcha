@@ -249,18 +249,18 @@ div#valid input{
     font-size: 20px;
     padding: 15px;
     border-radius: 15px;
-    background-color: #10ac84;
+    background-color: #ee5253;
     color: #fff;
     margin: 20px 10px;
     cursor: pointer;
 }
 div#valid input:nth-child(2){
-    background-color: #ee5253;
+    background-color: #10ac84;
 }
 div#valid input:nth-child(1):hover{
-    background-color: #098666;
+    background-color: #ce1819;
 }
 div#valid input:nth-child(2):hover{
-    background-color: #ce1819;
+    background-color: #098666;
 }
 </style>
