@@ -65,6 +65,8 @@ new Vue({
     // socket.on('event', function(data){});
     socket.on('disconnect', () => {
       console.log('disconnect')
+
+
     });
   },
 })

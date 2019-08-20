@@ -21,21 +21,27 @@
 				<img class="logo-nav-matcha bimboom" alt="Matcha Logo" src="../../assets/matcha_logo.png">
 			</router-link>
 
-			<!-- IF LOG -->
-			<div v-if="userInfos" class="account">
-				<p> {{ userInfos.username }} </p>
-				<img v-bind:src="`http://localhost:3000/${userInfos.profile_pics[0]}`" alt="avatar">
-				<ul>
-					<a @click="gotoprofile()"><li>Profile</li></a>
-					<router-link tag="a" to="/settings"><li>Settings</li></router-link>
-					<a @click="logout()"><li>log out</li></a>
-				</ul>
-			</div>
-			<!-- IF NO LOG -->
-			<div v-else class="reg-log">
-				<router-link tag="a" to="/login/">login</router-link>
-				<router-link tag="a" to="/register">register</router-link>
-			</div>
+            <!-- IF LOG -->
+            <div v-if="userInfos" class="account">
+                <!-- Notif -->
+                <div id="notif" @click="gotonotif()">
+                    <div></div>
+                    <svg id="pikomit_notif" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480.12 500"><path d="M181.51,431.49a71.37,71.37,0,0,0,51.06,68.15h0a71,71,0,0,0,90.94-68.14v-4h-142Z" transform="translate(-12.44 -2.5)"></path><path d="M488.73,364.77h0a30.89,30.89,0,0,0-1.73-2.65l.25-.23-50.83-50.83V186.45l-.05-6.43h-.09A185.65,185.65,0,0,0,399.67,76.2,183.85,183.85,0,0,0,76.08,134.82,184.07,184.07,0,0,0,68.82,180h-.23v131L20.67,359l-2.89,2.92.24.22a30.89,30.89,0,0,0-1.73,2.65A28.64,28.64,0,0,0,37,407.44v.29H468v-.28a28.64,28.64,0,0,0,20.73-42.67Z" transform="translate(-12.44 -2.5)"></path></svg>
+                </div>
+
+                <p> {{ userInfos.username }} </p>
+                <img v-bind:src="`http://localhost:3000/${userInfos.profile_pics[0]}`" alt="avatar">
+                <ul>
+                    <a @click="gotoprofile()"><li>Profile</li></a>
+                    <router-link tag="a" to="/settings"><li>Settings</li></router-link>
+                    <a @click="logout()"><li>log out</li></a>
+                </ul>
+            </div>
+            <!-- IF NO LOG -->
+            <div v-else class="reg-log">
+                <router-link tag="a" to="/login/">login</router-link>
+                <router-link tag="a" to="/register">register</router-link>
+            </div>
 
 		</header>
 
@@ -61,13 +67,25 @@ export default {
         }
     },
     methods:{
+        //GO TO / REDIRECT
 		gotoprofile() {
             this.$router.push({name: 'ProfileComp', params: {id: this.$store.state.user.id}});
         },
-        logout() {
-            this.$cookies.remove('user_token')
+        gotonotif() {
+            console.log(this.$router.history.current.name)
+            this.$router.push({name: 'NotifComp'});
+        },
+        async logout() {
+            // Delete store + redirect
             this.$store.commit('SET_USER', null)
             this.$router.push('/login');
+            //Logout back
+            try {
+                const res = await this.$api.get(`/auth/disconnect`, {withCredentials: true});
+                //Delete cookie
+                this.$cookies.remove('user_token');
+            } 
+            catch (ex) { console.log(ex) }
         }
 	},
 	mounted(){
@@ -161,6 +179,7 @@ header#header div#open-nav p, nav ul > li {
     left: 8px;
 }
 
+
 /********* HEADER LOGO *********/
 header a.logo {
     height: 100%;
@@ -170,12 +189,17 @@ header a.logo img {
     height: 55px;
 }
 
+/*****************************************************************
+	RIGHT
+*****************************************************************/
+
 /* IF NOT LOG */
 /********* HEADER LOGIN / REGISTER *********/
 header div.reg-log {
     display: flex;
     align-items: center;
     cursor: pointer;
+    height: 100%;
 }
 header div.reg-log a {
 	display: flex;
@@ -191,6 +215,22 @@ header div.reg-log a:nth-child(2) {
 }
 
 /* IF NOT LOG */
+/********* NOTIF *********/
+header #notif {
+    width: 27px;
+    fill: #fff;
+    height: 27px;
+    cursor: pointer;
+}
+header #notif > div {
+    width: 22px;
+    height: 22px;
+    background: #ee5659;
+    border-radius: 50px;
+    position: absolute;
+    margin: -5px 0px 0px -6px;
+}
+
 /********* HEADER PROFILE *********/
 header div.account {
     display: flex;

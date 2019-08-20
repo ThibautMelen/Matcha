@@ -1,6 +1,7 @@
 const express = require('express');
 const methods = require('./methods');
 const multer  = require('multer');
+const auth = require('../../middlewares/auth')
 
 const upload = multer({ dest: 'uploads/' });
 
@@ -27,5 +28,12 @@ module.exports = () => {
 
     // Upload image
     router.post('/image', upload.single('file'), methods.image);
+
+    // Like a user
+    router.get('/like/:id', auth, methods.like)
+
+    // Unlike a user
+    router.get('/unlike/:id', auth, methods.unlike)
+
     return router;
 };

@@ -11,6 +11,8 @@ const setupRouter = require('./routers/setup/routes');
 const authRouter = require('./routers/auth/routes');
 const userRouter = require('./routers/user/routes');
 
+const utils = require('./utils');
+
 module.exports = class Server {
 
     constructor(port) {
@@ -44,10 +46,7 @@ module.exports = class Server {
         }))
 
         this.app.use(cookieParser());
-        this.app.use((req, res, next) => {
-            req.db = this.db;
-            next();
-        });
+
 
         this.db = mysql.createConnection({
             host     : 'localhost',
@@ -55,6 +54,10 @@ module.exports = class Server {
             user     : 'root',
             password : 'your_current_password',
             database : 'matchadb'
+        });
+        this.app.use((req, res, next) => {
+            req.db = this.db;
+            next();
         });
 
         this.app.use('/setup', setupRouter());
@@ -72,13 +75,52 @@ module.exports = class Server {
             })
 
             let socket = io(this.server)
+            
 
-            socket.on('connect', (sock) => {
-                console.log(sock)
-                console.log('a user connected');
+            socket.on('connect', async (sock) => {
+                //Change To Online 1
+                try {
+                    let cookies = sock.handshake.headers.cookie.split(';').map(v => ({name: v.split('=')[0], value: v.split('=')[1]}))
+                    let token = cookies.find(v => v.name === 'user_token')
 
-                sock.on('disconnect', (sock) => {
-                    console.log('a user disconnected');
+                    if (token) {
+                        let decodedToken = await utils.verifyJWTToken(token.value)
+                        let sql = "UPDATE users SET online = ? WHERE id = ?";
+                        let inserts = [1, decodedToken.data.id];
+
+                        this.db.query(sql, inserts, (err, results) => {
+                            if (err) {
+                                console.log(`Failed to set user as connected (id: ${decodedToken.data.id})`)
+                            }
+                            console.log(`Online id : ${decodedToken.data.id}`)
+                        });
+                    }
+                } catch(err){
+                    console.log(err)
+                }
+                sock.on('disconnect', async () => {
+                    //Change To Offline 0 //WITH SOCKET
+                    var today  = new Date();
+                    try {
+                        let cookies = sock.handshake.headers.cookie.split(';').map(v => ({name: v.split('=')[0], value: v.split('=')[1]}))
+                        let token = cookies.find(v => v.name === 'user_token')
+
+                        if (token) {
+                            let decodedToken = await utils.verifyJWTToken(token.value)
+                            let sql = "UPDATE users SET online = ?, last_co = ? WHERE id = ?";
+                            let inserts = [0, today.toLocaleDateString("en-GB"), decodedToken.data.id];
+
+                            this.db.query(sql, inserts, (err, results) => {
+                                if (err) {
+                                    console.log(`Failed to set user as connected (id: ${decodedToken.data.id})`)
+                                }
+                                console.log(`Disconnected id : ${decodedToken.data.id} (with socket)`)
+                            });
+                            
+                        }
+                    }catch(err){
+                        console.log(err)
+                    }
                 })
             })
         })

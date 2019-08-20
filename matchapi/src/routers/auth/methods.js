@@ -14,6 +14,8 @@ module.exports = {
 
                 const data = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users WHERE id = ?', decodedToken.data.id)
 
+                var today  = new Date();
+
                 if (data[0]) {
                     let userInfos =  {
                         id: data[0].id,
@@ -24,11 +26,12 @@ module.exports = {
                         bio: data[0].bio,
                         type: data[0].type,
                         age: data[0].age,
-                        last_co: `15/08/2019`,
                         sexual_orientations: data[0].sexual_orientations.split(','),
                         interests: data[0].interests.split(',').map(v => ({text: v})), 
                         profile_pics: data[0].profile_pics.split(','),
-                        liked: true
+                        likes: data[0].likes ? data[0].likes.split(',') : null,
+                        online: data[0].online,
+                        last_co: today.toLocaleDateString("en-GB")
                     }
 
                     res.status(200).json({success: true, userInfos})
@@ -37,6 +40,7 @@ module.exports = {
                     res.status(200).json({success: false})
                 }
             } catch(ex) {
+                console.log(ex)
                 res.status(200).json({success: false})
             }
         }
@@ -61,6 +65,7 @@ module.exports = {
 
         // INSERT
         try {
+            //Verif Info + Store
             req.db.query("SELECT * FROM users WHERE username = ?", body.username, async (err, data) => {
                 
                 if (err) return res.status(500).json({ error: 'SQL ERROR' });
@@ -82,6 +87,7 @@ module.exports = {
                 }
 
                 const token = await utils.createJWTToken({sessionData: data_token, maxAge: '14d'})
+                var today  = new Date();
 
                 let userInfos =  {
                     id: data[0].id,
@@ -92,17 +98,59 @@ module.exports = {
                     bio: data[0].bio,
                     type: data[0].type,
                     age: data[0].age,
-                    last_co: `15/08/2019`,
                     sexual_orientations: data[0].sexual_orientations.split(','),
                     interests: data[0].interests.split(',').map(v => ({text: v})), 
                     profile_pics: data[0].profile_pics.split(','),
-                    liked: true
+                    likes: data[0].likes ? data[0].likes.split(',') : null,
+                    online: data[0].online,
+                    last_co: today.toLocaleDateString("en-GB")
                 }
 
                 res.status(200).json({ success: 'OK', token, userInfos });
+
+                //Change To Online 1
+                try {
+                    let sql = "UPDATE users SET online = ? WHERE id = ?";
+                    let inserts = [1, userInfos.id];
+
+                    req.db.query(sql, inserts, (err, results) => {
+                        if (err) {
+                            console.log(`Failed to set user as connected (id: ${userInfos.id})`)
+                        }
+                        console.log(`Online id : ${userInfos.id}`)
+                    });
+                } catch(err){
+                    console.log(err)
+                }
             });
+
         } catch(ex) {
             return res.status(520).json({ error: 'Unknown error 0000' });
+        }
+    },
+
+    disconnect: async (req, res) => {
+        if (!req.user) {
+            return res.status(203).json({error: 'validation_error', message: err});
+        }
+
+        //Change To Offline 0 WITH LOGOUT()
+        var today  = new Date();
+        try {
+            let sql = "UPDATE users SET online = ?, last_co = ? WHERE id = ?";
+            let inserts = [0, today.toLocaleDateString("en-GB"), req.user.id];
+
+            req.db.query(sql, inserts, (err, results) => {
+                if (err) {
+                    console.log(`Failed to set user as disconnected (id: ${req.user.id})`)
+                    return res.status(500).json({ success: false });
+                }
+                console.log(`Disconnected id : ${req.user.id} (with logout())`)
+                return res.status(200).json({ success: true });
+            });
+        } catch(err){
+            console.log(err)
+            return res.status(500).json({ success: false });
         }
     },
 
@@ -146,9 +194,6 @@ module.exports = {
             return res.status(203).json({error: 'image_error', message: 'Unknown Error 0010'});
         }
 
-        //utiliser une function utils
-        // utils.oui();
-
         // Username it's free ?
         try {
             const data = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users WHERE username = ?', body.username);
@@ -171,7 +216,7 @@ module.exports = {
 
         // INSERT
         try {
-
+            var today  = new Date();
             let inserts = {
                 username: body.username,
                 pass : await bcrypt.hash(body.password, saltRounds),
@@ -187,7 +232,9 @@ module.exports = {
                 lng: body.lng,
                 interests: body.interests.map(v => v.text).join(','),
                 sexual_orientations: body.sexual_orientations.join(','),
-                confirm: 0
+                confirm: 0,
+                online: 0,
+                last_co: today.toLocaleDateString("en-GB")
             };
             await util.promisify(req.db.query).bind(req.db)('INSERT INTO users SET ?', inserts);
             res.status(200).json({ success: 'OK' });

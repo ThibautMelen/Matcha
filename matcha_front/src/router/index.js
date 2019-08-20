@@ -5,6 +5,7 @@ import LoginComp from '@/components/auth/Login.vue';
 import RegisterComp from '@/components/auth/Register.vue';
 import HomeComp from '@/components/basic/Home.vue';
 import ProfileComp from '@/components/user/Profile.vue';
+import NotifComp from '@/components/user/Notif.vue';
 import SettingsComp from '@/components/user/Settings.vue';
 import store from '../store'
 
@@ -33,6 +34,12 @@ export default new Router({
       path: '/profile/:id',
       name: 'ProfileComp',
       component: ProfileComp
+    },
+    {
+      path: '/notification',
+      name: 'NotifComp',
+      component: NotifComp,
+      
     },
     {
       path: '/settings',

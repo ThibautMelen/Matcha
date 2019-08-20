@@ -8,6 +8,8 @@ module.exports = () => {
     router.get('/verify', methods.verify);
     
     router.post('/login', methods.login);
+
+    router.get('/disconnect', auth, methods.disconnect);
     
     router.post('/register', methods.register);
 

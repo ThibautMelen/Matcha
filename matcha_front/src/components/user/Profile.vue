@@ -3,9 +3,11 @@
 
         <div v-if="userinfo" id="left">
 			<img v-if="userinfo.profile_pics" v-bind:src="`http://localhost:3000/${userinfo.profile_pics[0]}`" alt="avatar">
-            <button v-if="profilelike == 0" @click="like()" style="background-color: #ed5673">Like</button>
-            <button v-if="profilelike == 1" @click="likeback()" style="background-color: #f368e0">Like back</button>
-            <button v-if="profilelike == 2" @click="likemove()" style="background-color: #10ac84">Remove Like</button>
+            <div v-if="this.$store.state.user && this.$store.state.user.id !== userinfo.id">
+                <button v-if="this.$store.state.user.likes && this.$store.state.user.likes.includes(userinfo.id.toString())" @click="likeRemove()" style="background-color: #ed5673">Remove Like</button>
+                <button v-else-if="!userinfo.likes || !userinfo.likes.includes(this.$store.state.user.id)" @click="like()" style="background-color: #10ac84">Like</button>
+                <button v-else-if="userinfo.likes && userinfo.likes.includes(this.$store.state.user.id)" @click="like()" style="background-color: #f368e0">Like back</button>
+            </div>
         </div>
 
         <div v-if="userinfo" id="info">
@@ -43,48 +45,57 @@ export default {
         }
     },
     methods:{
+        //USER PAGE INFO
 		async fetchSglUsers(userid) {
 			try {
                 const res = await this.$api.get(`/user/${userid}`);
                 this.userinfo = res.data;
-                console.log(this.userinfo)
-               
                 if (this.userinfo.liked)
                     this.profilelike = 1;
 			} catch (ex) {
 				console.log(ex)
 			}
         },
+        //LIKE USER
         async like() {
           	try {
-                console.log(`Like this profile`);
-                this.profilelike = 2;
+                const res = await this.$api.get(`/user/like/${this.userinfo.id}`, {withCredentials: true});
+
+                if (res.data.success) {
+                    this.$store.commit('SET_USER', {...this.$store.state.user, likes: res.data.likes})
+                    console.log(this.userinfo.id)
+
+                    console.log(this.$store.state.user.likes.includes(this.userinfo.id.toString()))
+                }
+                else {
+                    alert('Server error.')
+                }
 			} catch (ex) {
+                alert('Server error.')
 				console.log(ex)
 			}  
         },
-        async likeback() {
+        async likeRemove() {
           	try {
-                console.log(`Like back this profile`);
-                this.profilelike = 2;
+                const res = await this.$api.get(`/user/unlike/${this.userinfo.id}`, {withCredentials: true});
+
+                if (res.data.success) {
+                    this.$store.commit('SET_USER', {...this.$store.state.user, likes: res.data.likes})
+                    console.log(this.userinfo.id)
+
+                    console.log(this.$store.state.user.likes.includes(this.userinfo.id.toString()))
+                }
+                else {
+                    alert('Server error.')
+                }
 			} catch (ex) {
-				console.log(ex)
-			}  
-        },
-        async likemove() {
-          	try {
-                console.log(`Like back this profile`);
-                if(this.userinfo.liked)
-                    this.profilelike = 1;
-                else
-                    this.profilelike = 0;
-			} catch (ex) {
+                alert('Server error.')
 				console.log(ex)
 			}  
         }
     },
 	mounted(){
-		this.fetchSglUsers(this.$route.params.id);
+        this.fetchSglUsers(this.$route.params.id);
 	}
 }
 </script>
@@ -129,6 +140,7 @@ section#profil div#left button {
     border-radius: 15px;
     margin-top: 15px;
     cursor: pointer;
+    width: 100%;
 }
 
 /*****************************************************************

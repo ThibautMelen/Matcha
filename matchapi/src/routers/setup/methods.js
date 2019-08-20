@@ -26,7 +26,10 @@ module.exports = {
                     "`interests` varchar(255) NOT NULL," +
                     "`profile_pics` varchar(255) NOT NULL," +
                     "`sexual_orientations` varchar(255) NOT NULL," +
-                    "`confirm` int(11) NOT NULL" +
+                    "`confirm` int(11) NOT NULL," +
+                    "`online` int(11) NOT NULL," +
+                    "`likes` varchar(255)," +
+                    "`last_co` varchar(255) NOT NULL" +
                     ") ENGINE=InnoDB DEFAULT CHARSET=utf8";
 
         req.db.query(sql, (err, results) => {

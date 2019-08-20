@@ -14,7 +14,8 @@ const verifyToken = async (req, res, next) => {
         }
     }
     else {
-        res.status(401).json({error : ex});
+        res.status(401).json({error : 'No cookie'});
+        console.log('No cookie');
     }
 }
 
