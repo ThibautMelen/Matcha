@@ -6,7 +6,7 @@ const verifyToken = async (req, res, next) => {
 
         try{
             let decodedToken = await utils.verifyJWTToken(token)
-            req.user = decodedToken
+            req.user = decodedToken.data
             next()
         }catch(ex) {
             console.error(ex);

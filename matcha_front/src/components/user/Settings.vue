@@ -42,7 +42,7 @@
             </div>
 
             <div class="input-group">      
-                <input v-model="formdata.password" type="password" required>
+                <input v-model="formdata.password" type="password">
                 <span class="highlight"></span>
                 <span class="bar"></span>
                 <label>Password</label>
@@ -56,16 +56,16 @@
             </div>
 
             <div class="input-group">      
-                <select v-model="formdata.type" required>
+                <select @change="onTypeChange" required>
                     <option disabled>Choose a specie</option>
-                    <option selected>Male</option>
-                    <option>Woman</option>
-                    <option>Alien</option>
-                    <option>Cyborg</option>
-                    <option>Giant</option>
-                    <option>Minks</option>
-                    <option>Elve</option>
-                    <option>Troll</option>
+                    <option :selected="formdata.type === 'Male'">Male</option>
+                    <option :selected="formdata.type === 'Woman'">Woman</option>
+                    <option :selected="formdata.type === 'Alien'">Alien</option>
+                    <option :selected="formdata.type === 'Cyborg'">Cyborg</option>
+                    <option :selected="formdata.type === 'Giant'">Giant</option>
+                    <option :selected="formdata.type === 'Minks'">Minks</option>
+                    <option :selected="formdata.type === 'Elve'">Elve</option>
+                    <option :selected="formdata.type === 'Troll'">Troll</option>
                 </select>
             </div>
 
@@ -91,8 +91,8 @@
 
             <div class="input-group">
                 <vue-tags-input
-                v-model="formdata.tag"
-                :tags="formdata.tags"
+                v-model="tag"
+                :tags="tags"
                 :autocomplete-items="filteredItems"
                 @tags-changed="newTags => tags = newTags"
                 />
@@ -131,7 +131,9 @@ import VueUploadMultipleImage from 'vue-upload-multiple-image'
 
 export default {
     data(){
+        console.log()
         return {
+            //INPUT INFOS
             formdata:{
                 username: this.$store.state.user ? this.$store.state.user.username : '',
                 password:'',
@@ -142,11 +144,11 @@ export default {
                 age: this.$store.state.user ? this.$store.state.user.age : '',
                 type: this.$store.state.user ? this.$store.state.user.type : '',
                 sexual_orientations: this.$store.state.user ? this.$store.state.user.sexual_orientations : [],
-                tags: this.$store.state.user ? this.$store.state.user.interests : [],
-                tag: '',
             },
+            // INTEREST LIST
             tags: this.$store.state.user ? this.$store.state.user.interests : [],
             tag: '',
+            // IMAGE LIST
             images: [],
             profile_pics: [],
             autocompleteItems: [],
@@ -160,11 +162,11 @@ export default {
     methods:{
         //UPDATE NEW SETTINGS
         async settings () {
+            console.log(`Settings()`);
             if (this.uploading_image) {
                 alert('Please wait, image is uploading')
                 return
             }
-
             let data = {
                 username: this.formdata.username,
                 password: this.formdata.password,
@@ -180,15 +182,14 @@ export default {
                 lat: parseFloat(0),
                 profile_pics: this.profile_pics
             }
-            console.log(data);
-            console.table(data.profile_pics, this.profile_pics);
 
             // AXIOS BDD
             try {
-                const res = await this.$api.post('/auth/register', data);
+                const res = await this.$api.post('/auth/update', data, {withCredentials: true});
 
-                console.log(res.data);
-                console.log(res.status);
+                if (res.data.userInfos) {
+                    this.$store.commit('SET_USER', res.data.userInfos)
+                }
 
                 //Gestion des erreurs 203
                 if(res.data.error == "validation_error")
@@ -197,8 +198,8 @@ export default {
                     alert(res.data.message);
                 else if(res.data.error == "email_already_use")
                     alert(res.data.message);
-                else if(res.data.success == "OK")
-                    this.$router.push('/login');
+                else if(res.data.success)
+                    this.$router.push({name: 'ProfileComp', params: {id: this.$store.state.user.id}});
             } catch (ex) {
                 console.log(ex);
             }
@@ -252,12 +253,15 @@ export default {
         dataChange (data) {
             console.log(data)
         },
+        onTypeChange(e) {
+            this.formdata.type = e.target.value
+        }
 
     },
     computed: {
         filteredItems() {
             return this.autocompleteItems.filter(i => {
-                return i.text.toLowerCase().indexOf(this.formdata.tag.toLowerCase()) !== -1;
+                return i.text.toLowerCase().indexOf(this.tag.toLowerCase()) !== -1;
             });
         },
     },

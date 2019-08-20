@@ -107,7 +107,6 @@ module.exports = {
     },
 
     register: async (req, res) => {
-
         console.log(req.body)
 
         let body;
@@ -205,6 +204,153 @@ module.exports = {
                 subject: 'Welcome to Matcha',
                 text: `
                 Validation link : http://localhost:3000/auth/validate/${mail_key}
+                `
+            })
+            console.log(`Mail sent to ${body.email}`)
+        }
+        catch(err) {
+            console.error('Mail error :', err)
+        }
+
+        //Add Tag Interest to DB if not exist
+        try {
+            for (let interest of body.interests) {
+                await util.promisify(req.db.query).bind(req.db)('INSERT INTO interests (text) SELECT * FROM (SELECT ?) AS tmp WHERE NOT EXISTS ( SELECT text FROM interests WHERE text = ? ) LIMIT 1;', [interest.text, interest.text]);
+            }
+        } catch(err) {
+            console.error(err)
+        }
+    },
+
+    update: async (req, res) => {
+        if (!req.user) {
+            return res.status(203).json({error: 'validation_error', message: err});
+        }
+
+        console.log(req.body)
+
+        let body;
+        try {
+            body = {
+                username: await utils.validator(req.body.username, {rules: ['string', 'alphanumeric'], formats: ['trim', 'lowercase'], min: 4, max: 15}),
+                password: req.body.password && req.body.password.length > 0 ? await utils.validator(req.body.password, {rules: ['string'], regex: /^[a-zA-Z0-9]{8,}$/, formats: ['trim'], max: 255}) : null,
+                email: await utils.validator(req.body.email, {rules: ['string'], regex: /^[^\W][a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)*\@[a-zA-Z0-9_]+(\.[a-zA-Z0-9_]+)*\.[a-zA-Z]{2,4}$/, formats: ['trim'], max: 255}),
+                first_name: await utils.validator(req.body.first_name, {rules: ['string'], formats: ['trim'], min: 2, max: 25}),
+                last_name: await utils.validator(req.body.last_name, {rules: ['string'], formats: ['trim'], min: 2, max: 25}),
+                bio: await utils.validator(req.body.bio, {rules: ['string'], formats: ['trim'], min: 10, max: 100}),
+                age: await utils.validator(req.body.age, {rules: ['number'], min: 16}),
+                type: await utils.validator(req.body.type, {rules: ['string'], formats: ['trim', 'lowercase'], enum: ['male','woman','alien','cyborg','giant','minks','elve','troll']}),
+                profile_pics: req.body.profile_pics && req.body.profile_pics.length > 0 ? await utils.validator(req.body.profile_pics, {rules: ['array'], min: 1, max: 5}) : null,
+                lat: await utils.validator(req.body.lat, {rules: ['number']}),
+                lng: await utils.validator(req.body.lng, {rules: ['number']}),
+                interests: await utils.validator(req.body.interests, {rules: ['array'], min: 0, max: 255}),
+                sexual_orientations: await utils.validator(req.body.sexual_orientations, {rules: ['array'], min: 1, max: 255}),
+            }
+        } catch (err) {
+            return res.status(203).json({error: 'validation_error', message: err});
+        }
+
+        console.log(body)
+        
+        let pathImages = []
+
+        if (body.profile_pics) {
+            try {
+                for (let profile_pic of body.profile_pics) {
+                    let image = fs.readFileSync(profile_pic)
+                    let path = `public/${profile_pic.split('/')[profile_pic.split('/').length - 1]}.jpg`;
+                    fs.writeFileSync(path, image)
+                    pathImages.push(path)
+                }
+            } catch (err) {
+                console.error(err)
+                return res.status(203).json({error: 'image_error', message: 'Unknown Error 0010'});
+            }
+        }
+
+        // Username it's free ?
+        try {
+            const data = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users WHERE username = ? AND id != ?', [body.username, req.user.id]);
+            if(data[0])
+                return res.status(203).json({error: 'username_exists', message: `Le nom d'utilisateur « ${data[0].username} » est déjà utilisée !`});
+        } catch(ex) {
+            return res.status(520).json({ error: 'Unknown error 0001' });
+        }
+
+        // Email it's free ?
+        try {
+            const data = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users WHERE email = ? AND id != ?', [body.email, req.user.id]);
+            if(data[0])
+                return res.status(203).json({error: 'email_exists', message: `L'email' « ${data[0].email} » est déjà utilisée !`});
+        } catch(ex) {
+            return res.status(520).json({ error: 'Unknown error 0002' });
+        }
+
+        // INSERT
+        try {
+
+            let inserts = {
+                username: body.username,
+                pass : body.password ? await bcrypt.hash(body.password, saltRounds) : null,
+                email: body.email,
+                first_name: body.first_name,
+                last_name: body.last_name,
+                bio: body.bio,
+                age: body.age,
+                type: body.type,
+                profile_pics: body.profile_pics ? pathImages.join(',') : null,
+                lat: body.lat,
+                lng: body.lng,
+                interests: body.interests.map(v => v.text).join(','),
+                sexual_orientations: body.sexual_orientations.join(',')
+            };
+
+            if (!inserts.pass) {
+                delete inserts.pass
+            }
+            if (!inserts.profile_pics) {
+                delete inserts.profile_pics
+            }
+
+            await util.promisify(req.db.query).bind(req.db)('UPDATE users SET ? WHERE id = ?', [inserts, req.user.id]);
+
+            const data = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users WHERE id = ?', req.user.id)
+
+            if (data[0]) {
+                let userInfos =  {
+                    id: data[0].id,
+                    username: data[0].username,
+                    first_name: data[0].first_name,
+                    last_name: data[0].last_name,
+                    email: data[0].email,
+                    bio: data[0].bio,
+                    type: data[0].type,
+                    age: data[0].age,
+                    last_co: `15/08/2019`,
+                    sexual_orientations: data[0].sexual_orientations.split(','),
+                    interests: data[0].interests.split(',').map(v => ({text: v})), 
+                    profile_pics: data[0].profile_pics.split(','),
+                    liked: true
+                }
+
+                return res.status(200).json({success: true, userInfos})
+            }
+            else {
+                return res.status(200).json({success: false})
+            }
+        } catch(err) {
+            console.error(err)
+            return res.status(520).json({ error: 'Unknown error 0004' });
+        }
+
+        //Send verification emal
+        try {
+            await utils.transporter.sendMail({
+                from: 'Matcha <test.dev.basilic@gmail.com>',
+                to: body.email,
+                subject: 'New informations',
+                text: `
+                Done.
                 `
             })
             console.log(`Mail sent to ${body.email}`)

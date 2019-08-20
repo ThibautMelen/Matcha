@@ -5,11 +5,11 @@ import App from './App'
 import router from './router'
 import axios from "axios";
 import VueCookies from 'vue-cookies'
-import Chat from 'vue-beautiful-chat'
 import store from './store'
+import io from 'socket.io-client';
+
 
 Vue.use(VueCookies)
-Vue.use(Chat)
 
 Vue.config.productionTip = false
 
@@ -56,5 +56,15 @@ new Vue({
       store.commit('SET_USER', null)
       store.commit('SET_LOADING', false)
     }
+
+    let socket = io('http://localhost:3000')
+
+    socket.on('connect', () => {
+      console.log('connect')
+    });
+    // socket.on('event', function(data){});
+    socket.on('disconnect', () => {
+      console.log('disconnect')
+    });
   },
 })

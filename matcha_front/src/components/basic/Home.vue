@@ -24,7 +24,6 @@
                     </div>
                 </Vue2InteractDraggable>
             </div>
-
             <div
                 v-if="next"
                 class="card card-next"
@@ -34,7 +33,6 @@
                     <p>{{next.text}}</p>
                 </div>
             </div>
-
             <div
                 v-if="index + 2 < cards.length"
                 class="card card-next"

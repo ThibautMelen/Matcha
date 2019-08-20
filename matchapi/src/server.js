@@ -5,6 +5,7 @@ const cors = require('cors');
 const parser = require('body-parser');
 const mysql = require('mysql');
 const cookieParser = require('cookie-parser');
+const io = require('socket.io');
 
 const setupRouter = require('./routers/setup/routes');
 const authRouter = require('./routers/auth/routes');
@@ -68,6 +69,17 @@ module.exports = class Server {
             if (err) throw err
             this.server.listen(this.port, () => {
                 console.log(`server started on port ${this.port}`);
+            })
+
+            let socket = io(this.server)
+
+            socket.on('connect', (sock) => {
+                console.log(sock)
+                console.log('a user connected');
+
+                sock.on('disconnect', (sock) => {
+                    console.log('a user disconnected');
+                })
             })
         })
     }
