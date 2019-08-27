@@ -4,13 +4,49 @@
     <section v-if="this.$store.state.user" id="search">
         <div class="range">
             <p>Search people betwen {{ageRange1}} and {{ageRange2}} years old</p>
-            <input type="range" min="16" max="700" step="1" value="25" class="slider" v-model="ageRange1">
-            <input type="range" min="16" max="700" step="1" value="450" class="slider" v-model="ageRange2">
+            <input type="range" min="16" max="700" step="1" :value="ageRange1" class="slider" @change="(e) => {
+                if (e.target.value < this.ageRange2) {
+                    this.ageRange1 = e.target.value
+                }
+                else {
+                    this.ageRange1 = parseInt(this.ageRange2) - 1
+                }
+                this.search()
+                }">
+            <input type="range" min="16" max="700" step="1" :value="ageRange2" class="slider" @change="(e) => {
+                if (e.target.value > this.ageRange1) {
+                    this.ageRange2 = e.target.value
+                }
+                else {
+                    this.ageRange2 = parseInt(this.ageRange1) + 1
+                }
+                this.search()
+                }">
         </div>
         <div class="range">
             <p>Search people with popularity betwen {{popRange1}} and {{popRange2}}</p>
-            <input type="range" min="0" max="100" step="1" value="35" class="slider" v-model="popRange1">
-            <input type="range" min="0" max="100" step="1" value="75" class="slider" v-model="popRange2">
+            <input type="range" min="0" max="1000" step="1" :value="popRange1" class="slider" @change="(e) => {
+                if (e.target.value < this.popRange2) {
+                    this.popRange1 = e.target.value
+                }
+                else {
+                    this.popRange1 = parseInt(this.popRange2) - 1
+                }
+                this.search()
+                }">
+            <input type="range" min="0" max="1000" step="1" :value="popRange2" class="slider" @change="(e) => {
+                if (e.target.value > this.popRange1) {
+                    this.popRange2 = e.target.value
+                }
+                else {
+                    this.popRange2 = parseInt(this.popRange1) + 1
+                }
+                this.search()
+                }">
+        </div>
+        <div class="range">
+            <p>Distance {{kmRange}}km</p>
+            <input type="range" min="1" max="1000" step="1" value="35" class="slider" v-model="kmRange">
         </div>
         <div class="range">
             <vue-tags-input
@@ -20,7 +56,10 @@
             @tags-changed="newTags => tags = newTags"
             />
         </div>
-        <input type="text" maxlength= "12" placeholder="Search..." class="searchbar">
+        <input :value="searchValue" type="text"  maxlength="15" placeholder="Search..." class="searchbar" @change="(e) => {
+                this.searchValue = e.target.value
+                this.search()
+                }">
         <div id="listUser">
             <div v-for="(item, index) in items" :key="index">
                 <img src="http://localhost:3000/public/bf00cbe9f7808ec597efb2e00f2cbf6e.jpg" alt="avatar">
@@ -40,23 +79,6 @@ export default {
         console.log()
         return {
             items: [
-                { username: 'Emilia Clark' },
-                { username: 'Pénélope Cruz' },
-                { username: 'Gigi Hadid' },
-                { username: 'Janelle Monae' },
-                { username: 'Marion Cotillard' },
-                { username: 'Rihanna' },
-                { username: 'Margot Robbie' },
-                { username: 'Emily Ratajkowski' },
-                { username: 'Angelina Jolie' },
-                { username: 'Pénélope Cruz' },
-                { username: 'Gigi Hadid' },
-                { username: 'Janelle Monae' },
-                { username: 'Marion Cotillard' },
-                { username: 'Rihanna' },
-                { username: 'Margot Robbie' },
-                { username: 'Emily Ratajkowski' },
-                { username: 'Angelina Jolie' },
             ],
              // INTEREST LIST
             tags: this.$store.state.user ? this.$store.state.user.interests : [],
@@ -66,7 +88,9 @@ export default {
             ageRange1 : 135,
             ageRange2 : 450,
             popRange1 : 35,
-            popRange2 : 75
+            popRange2 : 75,
+            kmRange: 0,
+            searchValue: ''
         }
     },
     components: {
@@ -82,7 +106,26 @@ export default {
                 console.log(ex);
             }
         },
+        async search () {
+            try {
+                const body = {
+                    ageRange1 : this.ageRange1,
+                    ageRange2 : this.ageRange2,
+                    popRange1 : this.popRange1,
+                    popRange2 : this.popRange2,
+                    kmRange: this.kmRange,
+                    interests: this.tags,
+                    search: this.searchValue
+                }
+                const res = await this.$api.post(`/user/search`, body, {withCredentials: true});
 
+                if (res.data.success) {
+                    this.items = res.data.users
+                }
+            } catch (ex) {
+                console.log(ex);
+            }
+        }
     },
     computed: {
         filteredItems() {
@@ -94,6 +137,7 @@ export default {
     mounted() {
         console.log(`mounted`);
         this.fetchInterest();
+        this.search()
     },
 
 }

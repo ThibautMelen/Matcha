@@ -31,7 +31,10 @@ module.exports = {
                         profile_pics: data[0].profile_pics.split(','),
                         likes: data[0].likes ? data[0].likes.split(',') : null,
                         online: data[0].online,
-                        last_co: today.toLocaleDateString("en-GB")
+                        lat: data[0].lat,
+                        lng: data[0].lng,
+                        last_co: today.toLocaleDateString("en-GB"),
+                        fame: data[0],
                     }
 
                     res.status(200).json({success: true, userInfos})
@@ -103,7 +106,10 @@ module.exports = {
                     profile_pics: data[0].profile_pics.split(','),
                     likes: data[0].likes ? data[0].likes.split(',') : null,
                     online: data[0].online,
-                    last_co: today.toLocaleDateString("en-GB")
+                    lat: data[0].lat,
+                    lng: data[0].lng,
+                    last_co: today.toLocaleDateString("en-GB"),
+                    fame: data[0],
                 }
 
                 res.status(200).json({ success: 'OK', token, userInfos });
@@ -169,12 +175,13 @@ module.exports = {
                 age: await utils.validator(req.body.age, {rules: ['number'], min: 16}),
                 type: await utils.validator(req.body.type, {rules: ['string'], formats: ['trim', 'lowercase'], enum: ['male','woman','alien','cyborg','giant','minks','elve','troll']}),
                 profile_pics: await utils.validator(req.body.profile_pics, {rules: ['array'], min: 1, max: 5}),
-                lat: await utils.validator(req.body.lat, {rules: ['number']}),
-                lng: await utils.validator(req.body.lng, {rules: ['number']}),
+                lat: await utils.validator(parseFloat(typeof req.body.lat === 'string' ? req.body.lat.replace(',', '.') : req.body.lat), {rules: ['number']}),
+                lng: await utils.validator(parseFloat(typeof req.body.lng === 'string' ? req.body.lng.replace(',', '.') : req.body.lng), {rules: ['number']}),
                 interests: await utils.validator(req.body.interests, {rules: ['array'], min: 0, max: 255}),
                 sexual_orientations: await utils.validator(req.body.sexual_orientations, {rules: ['array'], min: 1, max: 255}),
             }
         } catch (err) {
+            console.log(err)
             return res.status(203).json({error: 'validation_error', message: err});
         }
 
@@ -234,7 +241,8 @@ module.exports = {
                 sexual_orientations: body.sexual_orientations.join(','),
                 confirm: 0,
                 online: 0,
-                last_co: today.toLocaleDateString("en-GB")
+                last_co: today.toLocaleDateString("en-GB"),
+                fame: 0
             };
             await util.promisify(req.db.query).bind(req.db)('INSERT INTO users SET ?', inserts);
             res.status(200).json({ success: 'OK' });
@@ -288,8 +296,8 @@ module.exports = {
                 age: await utils.validator(req.body.age, {rules: ['number'], min: 16}),
                 type: await utils.validator(req.body.type, {rules: ['string'], formats: ['trim', 'lowercase'], enum: ['male','woman','alien','cyborg','giant','minks','elve','troll']}),
                 profile_pics: req.body.profile_pics && req.body.profile_pics.length > 0 ? await utils.validator(req.body.profile_pics, {rules: ['array'], min: 1, max: 5}) : null,
-                lat: await utils.validator(req.body.lat, {rules: ['number']}),
-                lng: await utils.validator(req.body.lng, {rules: ['number']}),
+                lat: await utils.validator(parseFloat(typeof req.body.lat === 'string' ? req.body.lat.replace(',', '.') : req.body.lat), {rules: ['number']}),
+                lng: await utils.validator(parseFloat(typeof req.body.lat === 'string' ? req.body.lat.replace(',', '.') : req.body.lat), {rules: ['number']}),
                 interests: await utils.validator(req.body.interests, {rules: ['array'], min: 0, max: 255}),
                 sexual_orientations: await utils.validator(req.body.sexual_orientations, {rules: ['array'], min: 1, max: 255}),
             }
@@ -377,7 +385,9 @@ module.exports = {
                     sexual_orientations: data[0].sexual_orientations.split(','),
                     interests: data[0].interests.split(',').map(v => ({text: v})), 
                     profile_pics: data[0].profile_pics.split(','),
-                    liked: true
+                    lat: data[0].lat,
+                    lng: data[0].lng,
+                    fame: data[0],
                 }
 
                 res.status(200).json({success: true, userInfos})

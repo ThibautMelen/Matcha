@@ -116,6 +116,22 @@
             </div>
 
             <div class="input-group">
+                <input v-model="formdata.lat" type="number" step="any" required>
+                <span class="highlight"></span>
+                <span class="bar"></span>
+                <label>Latitude</label>
+            </div>
+
+            <div class="input-group">
+                <input v-model="formdata.lng" type="number" step="any" required>
+                <span class="highlight"></span>
+                <span class="bar"></span>
+                <label>Longitude</label>
+            </div>
+
+            <a class="input-group" :href="`https://www.latlong.net/c/?lat=${this.formdata.lat}&long=${this.formdata.lng}`" target="_blank">View the Map</a>
+
+            <div class="input-group">
                 <input type="submit" value="Update Info">
             </div>
 
@@ -144,6 +160,8 @@ export default {
                 age: this.$store.state.user ? this.$store.state.user.age : '',
                 type: this.$store.state.user ? this.$store.state.user.type : '',
                 sexual_orientations: this.$store.state.user ? this.$store.state.user.sexual_orientations : [],
+                lat: this.$store.state.user ? this.$store.state.user.lat : [],
+                lng: this.$store.state.user ? this.$store.state.user.lng : [],
             },
             // INTEREST LIST
             tags: this.$store.state.user ? this.$store.state.user.interests : [],
@@ -178,8 +196,8 @@ export default {
                 type: this.formdata.type,
                 interests: this.tags.map(v => ({text: v.text})),
                 sexual_orientations: this.formdata.sexual_orientations,
-                lng: parseFloat(0),
-                lat: parseFloat(0),
+                lng: this.formdata.lat,
+                lat: this.formdata.lng,
                 profile_pics: this.profile_pics
             }
 

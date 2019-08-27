@@ -187,6 +187,10 @@ module.exports = {
             return res.status(400).json({success: false})
         }
 
+        if (parseInt(req.params.id) === parseInt(req.user.id)) {
+            return res.status(200).json({success: true})
+        }
+
         try {
             const user = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users WHERE id = ?', req.user.id)
 
@@ -203,6 +207,81 @@ module.exports = {
             }
 
             res.status(200).json({success: true})
+        } catch (err) {
+            console.error(err)
+            return res.status(203).json({success: false})
+        }
+    },
+
+    
+
+    search: async (req, res) => {
+        if (!req.user || !req.body) {
+            return res.status(400).json({success: false})
+        }
+
+        try {
+            const deg2rad = (deg) => {
+                return deg * (Math.PI/180)
+            }
+
+            const getDistanceFromLatLonInKm = (lat1,lon1,lat2,lon2) => {
+                var R = 6371;
+                var dLat = deg2rad(lat2-lat1);
+                var dLon = deg2rad(lon2-lon1);
+                var a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2)
+                ; 
+                var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+                var d = R * c;
+                return d;
+            }
+
+            let current_user = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users WHERE id = ?', req.user.id)
+
+            let users = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users');
+
+            let filteredUsers = users.filter((v) => {
+                if (req.body.search) {
+                    if (!(v.username && v.username.match(new RegExp(req.body.search, 'i'))) && !(v.bio && v.bio.match(new RegExp(req.body.search, 'i')))) {
+                        console.log('ya')
+                        return false
+                    }
+                }
+                if (req.body.ageRange1 !== undefined && req.body.ageRange2 !== undefined) {
+                    if (v.age < parseInt(req.body.ageRange1) || v.age > parseInt(req.body.ageRange2)) {
+                        console.log('ytqa')
+                        return false
+                    }
+                }
+                if (req.body.popRange1 !== undefined && req.body.popRange2 !== undefined) {
+                    if (v.fame < parseInt(req.body.popRange1) || (parseInt(req.body.popRange2) < 1000 && v.fame > parseInt(req.body.popRange2))) {
+                        console.log(v.fame > parseInt(req.body.popRange2))
+                        return false
+                    }
+                }
+                if (req.body.kmRange) {
+                    let dist = getDistanceFromLatLonInKm(current_user.lat, current_user.lng, v.lat, v.lng)
+
+                    if (dist > parseInt(req.body.kmRange)) {
+                        console.log('yta')
+                        return false
+                    }
+                }
+                if (req.body.interests && req.body.interests.length > 0) {
+                    let userInterests = v.interests.split(',')
+                    let filteredInterests = req.body.interests.filter(interest => userInterests.includes(interest))
+
+                    if (!filteredInterests || filteredInterests.length < 1) {
+                        return false
+                    }
+                }
+                return true
+            })
+
+            return res.status(200).json({success: true, users: filteredUsers})
         } catch (err) {
             console.error(err)
             return res.status(203).json({success: false})

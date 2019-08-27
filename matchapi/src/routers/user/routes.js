@@ -38,5 +38,8 @@ module.exports = () => {
     // Unlike a user
     router.get('/visit/:id', auth, methods.visit)
 
+    // Unlike a user
+    router.post('/search', auth, methods.search)
+
     return router;
 };

@@ -19,7 +19,7 @@
             <h1>{{ userinfo.first_name }} {{ userinfo.last_name }}</h1>
             <h3 v-if="userinfo.online"><i>{{ userinfo.username }} · <span>Online</span></i></h3>
             <h3 v-else><i>{{ userinfo.username }} · {{userinfo.last_co}}</i></h3>
-            <h2>{{ userinfo.type }} - {{ userinfo.age }} <b>years old</b></h2>
+            <h2>{{ userinfo.type }} - {{ userinfo.age }} <b>years old</b> - {{ userinfo.fame }} <b>Popuplarity Fame</b></h2>
             <h4>{{ userinfo.first_name }} search
                 <div v-if="userinfo.sexual_orientations">
                     <span v-for="(item, index) in userinfo.sexual_orientations" :key="item">
@@ -53,6 +53,7 @@ export default {
 		async fetchSglUsers(userid) {
 			try {
                 const res = await this.$api.get(`/user/${userid}`);
+                console.log(res.data)
                 this.userinfo = res.data;
 			} catch (ex) {
 				console.log(ex)
@@ -109,7 +110,6 @@ export default {
                 this.imgNb += 1;
             else
                 this.imgNb = 0;
-            console.log(this.imgNb);
         },
         //BLOCK USER
         async blockUser(id) {
@@ -158,7 +158,7 @@ export default {
         this.fetchSglUsers(this.$route.params.id);
     },
     updated(){
-        if (this.userinfo.id !== this.$route.params.id) {
+        if (parseInt(this.userinfo.id) !== parseInt(this.$route.params.id)) {
             this.fetchSglUsers(this.$route.params.id);
         }
     }

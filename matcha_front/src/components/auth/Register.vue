@@ -116,6 +116,22 @@
             </div>
 
             <div class="input-group">
+                <input v-model="formdata.lat" type="number" step="any" required>
+                <span class="highlight"></span>
+                <span class="bar"></span>
+                <label>Latitude</label>
+            </div>
+
+            <div class="input-group">
+                <input v-model="formdata.lng" type="number" step="any" required>
+                <span class="highlight"></span>
+                <span class="bar"></span>
+                <label>Longitude</label>
+            </div>
+
+            <a class="input-group" :href="`https://www.latlong.net/c/?lat=${this.formdata.lat}&long=${this.formdata.lng}`" target="_blank">View the Map</a>
+
+            <div class="input-group">
                 <input type="submit" value="Join Matcha">
             </div>
 
@@ -145,6 +161,8 @@ export default {
                 sexual_orientations: [],
                 tags: [],
                 tag: '',
+                lat: 1,
+                lng: 1
             },
             // INTEREST LIST
             tags: [],
@@ -153,12 +171,12 @@ export default {
             // IMAGE LIST
             images: [],
             profile_pics: [],
-            uploading_image: false
+            uploading_image: false,
         }
     },
     components: {
         VueTagsInput,
-        VueUploadMultipleImage,
+        VueUploadMultipleImage
     },
     methods:{
         //REGISTER FORM
@@ -179,8 +197,8 @@ export default {
                 type: this.formdata.type,
                 interests: this.tags.map(v => ({text: v.text})),
                 sexual_orientations: this.formdata.sexual_orientations,
-                lng: parseFloat(0),
-                lat: parseFloat(0),
+                lng: this.formdata.lat,
+                lat: this.formdata.lng,
                 profile_pics: this.profile_pics
             }
             console.log(data);
@@ -266,6 +284,24 @@ export default {
     mounted() {
         this.fetchInterest();
         this.checkCo();
+
+        console.log('hello')
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                console.log('got it')
+                console.log('Latitude : ', position.coords.latitude)
+                console.log('Longitude : ', position.coords.longitude)
+                console.log(`La précision est de ${position.coords.accuracy} mètres.`)
+
+                this.formdata.lat = position.coords.latitude
+                this.formdata.lng = position.coords.longitude
+            },
+            (positionError) => {
+                console.log(positionError)
+            },
+            {timeout:20000}
+        )
     }
 }
 </script>
