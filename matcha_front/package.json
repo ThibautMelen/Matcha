@@ -24,6 +24,7 @@
     "vue-beautiful-chat": "^2.2.2",
     "vue-cookies": "^1.5.13",
     "vue-router": "^3.0.1",
+    "vue-toasted": "^1.1.27",
     "vue-upload-multiple-image": "^1.1.4",
     "vue2-interact": "0.0.3",
     "vue2-touch-events": "^2.0.0",

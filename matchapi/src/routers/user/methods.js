@@ -61,7 +61,7 @@ module.exports = {
     getOne: (req, res) => {
         let sql = `SELECT * FROM users WHERE id = ${req.params.id}`;
         req.db.query(sql, (err, results) => {
-            if(err) return res.status(500).json({success: false, error : "Fail Error"})
+            if(err || !results[0]) return res.status(500).json({success: false, error : "Fail Error"})
             results[0].profile_pics = results[0].profile_pics.split(',')
             results[0].interests = results[0].interests.split(',')
             results[0].sexual_orientations = results[0].sexual_orientations.split(',')
@@ -96,7 +96,7 @@ module.exports = {
         }
 
         try {
-            const user = await util.promisify(req.db.query).bind(req.db)('SELECT likes FROM users WHERE id = ?', req.user.id)
+            const user = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users WHERE id = ?', req.user.id)
             
             let likes = []
 
@@ -113,7 +113,26 @@ module.exports = {
             await util.promisify(req.db.query).bind(req.db)('UPDATE users SET likes = ? WHERE id = ?', [likes, req.user.id]);
 
             console.log(likes)
-            return res.status(200).json({success: true, likes: likes.split(',')})
+            res.status(200).json({success: true, likes: likes.split(',')})
+
+            let likedUser = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users WHERE id = ?', [req.params.id]);
+
+            if (likedUser[0] && likedUser[0].sid) {
+                let likedUserSocket = req.io.sockets.connected[likedUser[0].sid]
+
+                if (likedUserSocket) {
+                    let notifText = `${user[0].username} liked you !`
+                    if (likedUser[0].likes && likedUser[0].likes.split(',').includes(user[0].id.toString())) {
+                        notifText = `It's Match ! ${user[0].username} liked you back !`
+
+                        let currentUserSocket = req.io.sockets.connected[user[0].sid]
+                        if (currentUserSocket) {
+                            currentUserSocket.emit('notification', notifText)
+                        }
+                    }
+                    likedUserSocket.emit('notification', notifText)
+                }
+            }
         } catch (err) {
             console.error(err)
             return res.status(203).json({success: false})
@@ -144,7 +163,46 @@ module.exports = {
 
             await util.promisify(req.db.query).bind(req.db)('UPDATE users SET likes = ? WHERE id = ?', [likes, req.user.id]);
 
-            return res.status(200).json({success: true, likes: likes.split(',')})
+            res.status(200).json({success: true, likes: likes.split(',')})
+
+            let likedUser = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users WHERE id = ?', [req.params.id]);
+
+            if (likedUser[0] && likedUser[0].sid && likedUser[0].likes && likedUser[0].likes.split(',').includes(user[0].id.toString())) {
+                let likedUserSocket = req.io.sockets.connected[likedUser[0].sid]
+
+                if (likedUserSocket) {
+                    let notifText = `${user[0].username} doesn't like you anymore :( !`
+
+                    likedUserSocket.emit('notification', notifText)
+                }
+            }
+        } catch (err) {
+            console.error(err)
+            return res.status(203).json({success: false})
+        }
+    },
+
+    visit: async (req, res) => {
+        if (!req.user) {
+            return res.status(400).json({success: false})
+        }
+
+        try {
+            const user = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users WHERE id = ?', req.user.id)
+
+            let visitedUser = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users WHERE id = ?', [req.params.id]);
+
+            if (visitedUser[0] && visitedUser[0].sid) {
+                let visitedUserSocket = req.io.sockets.connected[visitedUser[0].sid]
+
+                if (visitedUserSocket) {
+                    let notifText = `${user[0].username} visited your profile !`
+
+                    visitedUserSocket.emit('notification', notifText)
+                }
+            }
+
+            res.status(200).json({success: true})
         } catch (err) {
             console.error(err)
             return res.status(203).json({success: false})

@@ -5,9 +5,9 @@
         <div id="notif">
             <h1>Notification : {{ this.$store.state.user.username }}</h1>
             <ul>
-                <li>Notif 1</li>
-                <li>Notif 2</li>
-                <li>Notif 3</li>
+                <li v-for="(notif, index) in this.$store.state.notifs" v-bind:key="index" @click="delNotif(index)">
+                    {{ notif }}
+                </li>
             </ul>
         </div>
     </section>
@@ -22,21 +22,16 @@ export default {
         }
     },
     methods:{
-        //FETCH INTERESET
-        async fetchNotif () {
-            // try {
-            //     const res = await this.$api.get('/user/interests');
-            //     this.autocompleteItems = res.data.interests;
-            // } catch (ex) {
-            //     console.log(ex);
-            // }
+        delNotif(notifIndex) {
+            this.$store.commit('REMOVE_NOTIF', notifIndex);
         }
-
     },
     mounted() {
-
-    }
-
+        this.$store.commit('SET_NEWNOTIF', false);
+    },
+    destroyed() {
+        this.$store.commit('SET_NEWNOTIF', false);
+    },
 }
 </script>
 
@@ -69,6 +64,9 @@ section#sectNotif div#notif ul {
     width: 100%;
     text-align: center;
     border-top: 2px solid #a5a5a5;
+    display: flex;
+    flex-direction: column-reverse;
+
 }
 section#sectNotif div#notif ul li{
     font-size: 20px;

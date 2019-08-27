@@ -60,11 +60,44 @@ module.exports = class Server {
             next();
         });
 
-        this.app.use('/setup', setupRouter());
-        this.app.use('/auth', authRouter());
-        this.app.use('/user', userRouter());
-
         this.server = http.createServer(this.app);
+    }
+
+    async handleConnect(sock, connect = true, user_token = null) {
+        if (sock.handshake.headers) {
+            try {
+                let cookies = sock.handshake.headers.cookie ? sock.handshake.headers.cookie.split(';').map(v => ({name: v.split('=')[0], value: v.split('=')[1]})) : []
+                console.log(cookies)
+                let token = cookies.find(v => v.name === 'user_token')
+
+                if (token) {
+                    token = token.value
+                }
+                else {
+                    token = user_token
+                }
+
+                //If User is connected
+                if (token) {
+                    console.log(sock.conn.id)
+                    console.log('yoooo', token)
+                    let decodedToken = await utils.verifyJWTToken(token)
+                    let sql = "UPDATE users SET online = ?, sid = ? WHERE id = ?";
+                    let inserts = [connect ? 1 : 0, connect ? sock.conn.id : null, decodedToken.data.id];
+                    console.log('yyyyaaaa')
+
+                    this.db.query(sql, inserts, (err, results) => {
+                        if (err) {
+                            console.log(`Failed to set user sid (id: ${decodedToken.data.id})`)
+                        }
+                        console.log(`${connect ? 'Online' : 'Disconnected'} id : ${decodedToken.data.id}`)
+                        console.log('toto', inserts)
+                    });
+                }
+            } catch(err){
+                console.log(err)
+            }
+        }
     }
 
     start() {
@@ -74,55 +107,29 @@ module.exports = class Server {
                 console.log(`server started on port ${this.port}`);
             })
 
-            let socket = io(this.server)
-            
+            let socketIo = io(this.server)
 
-            socket.on('connect', async (sock) => {
-                //Change To Online 1
-                try {
-                    let cookies = sock.handshake.headers.cookie.split(';').map(v => ({name: v.split('=')[0], value: v.split('=')[1]}))
-                    let token = cookies.find(v => v.name === 'user_token')
+            socketIo.on('connect', async (sock) => {
+                console.log('SID : ', sock.conn.id)
+                await this.handleConnect(sock, true)
 
-                    if (token) {
-                        let decodedToken = await utils.verifyJWTToken(token.value)
-                        let sql = "UPDATE users SET online = ? WHERE id = ?";
-                        let inserts = [1, decodedToken.data.id];
+                sock.on('set_sid', async (user_token) => {
+                    await this.handleConnect(sock, true, user_token)
+                })
 
-                        this.db.query(sql, inserts, (err, results) => {
-                            if (err) {
-                                console.log(`Failed to set user as connected (id: ${decodedToken.data.id})`)
-                            }
-                            console.log(`Online id : ${decodedToken.data.id}`)
-                        });
-                    }
-                } catch(err){
-                    console.log(err)
-                }
                 sock.on('disconnect', async () => {
-                    //Change To Offline 0 //WITH SOCKET
-                    var today  = new Date();
-                    try {
-                        let cookies = sock.handshake.headers.cookie.split(';').map(v => ({name: v.split('=')[0], value: v.split('=')[1]}))
-                        let token = cookies.find(v => v.name === 'user_token')
-
-                        if (token) {
-                            let decodedToken = await utils.verifyJWTToken(token.value)
-                            let sql = "UPDATE users SET online = ?, last_co = ? WHERE id = ?";
-                            let inserts = [0, today.toLocaleDateString("en-GB"), decodedToken.data.id];
-
-                            this.db.query(sql, inserts, (err, results) => {
-                                if (err) {
-                                    console.log(`Failed to set user as connected (id: ${decodedToken.data.id})`)
-                                }
-                                console.log(`Disconnected id : ${decodedToken.data.id} (with socket)`)
-                            });
-                            
-                        }
-                    }catch(err){
-                        console.log(err)
-                    }
+                    await this.handleConnect(sock, false)
                 })
             })
+
+            this.app.use((req, res, next) => {
+                req.io = socketIo;
+                next();
+            });
+
+            this.app.use('/setup', setupRouter());
+            this.app.use('/auth', authRouter());
+            this.app.use('/user', userRouter());
         })
     }
 }

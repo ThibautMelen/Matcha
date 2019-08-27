@@ -173,8 +173,6 @@ section#match {
     flex-direction: column;
 }
 
-
-
 /********* CONTAINER SWIPE *********/
 section#match .container-swipe{
     width: 100%;

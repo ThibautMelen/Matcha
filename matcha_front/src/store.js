@@ -7,7 +7,10 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
     state: {
         user: null,
-        loading: true
+        loading: true,
+        socket: null,
+        notifs: [],
+        newNotif: false
     },
     mutations: {
         SET_USER (state, user) {
@@ -15,6 +18,19 @@ const store = new Vuex.Store({
         },
         SET_LOADING (state, loading) {
             state.loading = loading
+        },
+        SET_SOCKET (state, socket) {
+            state.socket = socket
+        },
+        ADD_NOTIF (state, notif) {
+            state.notifs.push(notif)
+            state.newNotif = true
+        },
+        SET_NEWNOTIF (state, newNotif) {
+            state.newNotif = newNotif
+        },
+        REMOVE_NOTIF (state, index) {
+            state.notifs.splice(index, 1)
         }
     }
 })

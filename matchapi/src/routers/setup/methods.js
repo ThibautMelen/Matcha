@@ -29,6 +29,7 @@ module.exports = {
                     "`confirm` int(11) NOT NULL," +
                     "`online` int(11) NOT NULL," +
                     "`likes` varchar(255)," +
+                    "`sid` varchar(255)," +
                     "`last_co` varchar(255) NOT NULL" +
                     ") ENGINE=InnoDB DEFAULT CHARSET=utf8";
 

@@ -4,9 +4,9 @@
         <div v-if="userinfo" id="left">
 			<img v-if="userinfo.profile_pics" v-bind:src="`http://localhost:3000/${userinfo.profile_pics[imgNb]}`" @click="nextImg()" alt="avatar">
             <div v-if="this.$store.state.user && this.$store.state.user.id !== userinfo.id">
-                <button v-if="this.$store.state.user.likes && this.$store.state.user.likes.includes(userinfo.id.toString())" @click="likeRemove()" style="background-color: #ed5673">Remove Like</button>
-                <button v-else-if="!userinfo.likes || !userinfo.likes.includes(this.$store.state.user.id)" @click="like()" style="background-color: #10ac84">Like</button>
-                <button v-else-if="userinfo.likes && userinfo.likes.includes(this.$store.state.user.id)" @click="like()" style="background-color: #f368e0">Like back</button>
+                <button v-if="this.$store.state.user.likes && this.$store.state.user.likes.includes(userinfo.id.toString())" @click="likeRemove(userinfo.id)" style="background-color: #ed5673">Remove Like</button>
+                <button v-else-if="!userinfo.likes || !userinfo.likes.includes(this.$store.state.user.id)" @click="like(userinfo.id)" style="background-color: #10ac84">Like</button>
+                <button v-else-if="userinfo.likes && userinfo.likes.includes(this.$store.state.user.id)" @click="like(userinfo.id)" style="background-color: #f368e0">Like back</button>
             </div>
         </div>
 
@@ -35,7 +35,6 @@
     </section>
 </template>
 
-
 <script>
 export default {
     data(){
@@ -50,22 +49,28 @@ export default {
 			try {
                 const res = await this.$api.get(`/user/${userid}`);
                 this.userinfo = res.data;
-                if (this.userinfo.liked)
-                    this.profilelike = 1;
 			} catch (ex) {
 				console.log(ex)
-			}
+            }
+
+            if (this.$store.state.user) {
+                try {
+                    const res = await this.$api.get(`user/visit/${userid}`, {withCredentials: true});
+                } catch (ex) {
+                    console.log(ex)
+                }
+            }
         },
         //LIKE USER
-        async like() {
+        async like(id) {
           	try {
-                const res = await this.$api.get(`/user/like/${this.userinfo.id}`, {withCredentials: true});
+                const res = await this.$api.get(`/user/like/${id}`, {withCredentials: true});
 
                 if (res.data.success) {
                     this.$store.commit('SET_USER', {...this.$store.state.user, likes: res.data.likes})
-                    console.log(this.userinfo.id)
+                    console.log(id)
 
-                    console.log(this.$store.state.user.likes.includes(this.userinfo.id.toString()))
+                    console.log(this.$store.state.user.likes.includes(id.toString()))
                 }
                 else {
                     alert('Server error.')
@@ -75,15 +80,15 @@ export default {
 				console.log(ex)
 			}  
         },
-        async likeRemove() {
+        async likeRemove(id) {
           	try {
-                const res = await this.$api.get(`/user/unlike/${this.userinfo.id}`, {withCredentials: true});
+                const res = await this.$api.get(`/user/unlike/${id}`, {withCredentials: true});
 
                 if (res.data.success) {
                     this.$store.commit('SET_USER', {...this.$store.state.user, likes: res.data.likes})
-                    console.log(this.userinfo.id)
+                    console.log(id)
 
-                    console.log(this.$store.state.user.likes.includes(this.userinfo.id.toString()))
+                    console.log(this.$store.state.user.likes.includes(id.toString()))
                 }
                 else {
                     alert('Server error.')
@@ -104,11 +109,14 @@ export default {
     },
 	mounted(){
         this.fetchSglUsers(this.$route.params.id);
-	}
+    },
+    updated(){
+        if (this.userinfo.id !== this.$route.params.id) {
+            this.fetchSglUsers(this.$route.params.id);
+        }
+    }
 }
 </script>
-
-
 
 <style type="text/css">
 /*****************************************************************
@@ -130,9 +138,6 @@ section#profil div#left {
     background: #fff;
     border-radius: 40px;
     margin: 7px;
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
 }
 
 section#profil div#left img {

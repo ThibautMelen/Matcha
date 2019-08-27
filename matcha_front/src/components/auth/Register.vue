@@ -132,6 +132,7 @@ import VueUploadMultipleImage from 'vue-upload-multiple-image'
 export default {
     data(){
         return {
+            //INPUT INFOS
             formdata:{
                 username:'',
                 password:'',
@@ -145,11 +146,13 @@ export default {
                 tags: [],
                 tag: '',
             },
+            // INTEREST LIST
             tags: [],
             tag: '',
+            autocompleteItems: [],
+            // IMAGE LIST
             images: [],
             profile_pics: [],
-            autocompleteItems: [],
             uploading_image: false
         }
     },

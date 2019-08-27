@@ -146,7 +146,7 @@ module.exports = {
                     return res.status(500).json({ success: false });
                 }
                 console.log(`Disconnected id : ${req.user.id} (with logout())`)
-                return res.status(200).json({ success: true });
+                res.status(200).json({ success: true });
             });
         } catch(err){
             console.log(err)
@@ -380,10 +380,10 @@ module.exports = {
                     liked: true
                 }
 
-                return res.status(200).json({success: true, userInfos})
+                res.status(200).json({success: true, userInfos})
             }
             else {
-                return res.status(200).json({success: false})
+                res.status(200).json({success: false})
             }
         } catch(err) {
             console.error(err)

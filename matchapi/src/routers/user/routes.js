@@ -35,5 +35,8 @@ module.exports = () => {
     // Unlike a user
     router.get('/unlike/:id', auth, methods.unlike)
 
+    // Unlike a user
+    router.get('/visit/:id', auth, methods.visit)
+
     return router;
 };

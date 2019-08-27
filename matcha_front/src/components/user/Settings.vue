@@ -148,10 +148,10 @@ export default {
             // INTEREST LIST
             tags: this.$store.state.user ? this.$store.state.user.interests : [],
             tag: '',
+            autocompleteItems: [],
             // IMAGE LIST
             images: [],
             profile_pics: [],
-            autocompleteItems: [],
             uploading_image: false
         }
     },

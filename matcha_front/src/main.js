@@ -7,9 +7,15 @@ import axios from "axios";
 import VueCookies from 'vue-cookies'
 import store from './store'
 import io from 'socket.io-client';
+import Toasted from 'vue-toasted';
 
 
 Vue.use(VueCookies)
+
+//Toasted Notif
+Vue.use(Toasted, {
+  iconPack: 'material'// set your iconPack, defaults to material. material|fontawesome|custom-class
+})
 
 Vue.config.productionTip = false
 
@@ -29,7 +35,9 @@ new Vue({
   el: '#app',
   store,
   router,
-  components: { App },
+  components: {
+    App
+  },
   template: '<App/>',
   mounted() {
     if (token) {
@@ -59,14 +67,16 @@ new Vue({
 
     let socket = io('http://localhost:3000')
 
-    socket.on('connect', () => {
-      console.log('connect')
-    });
-    // socket.on('event', function(data){});
-    socket.on('disconnect', () => {
-      console.log('disconnect')
+    socket.on('notification', (notif) => {
+      store.commit('ADD_NOTIF', notif)
 
+      Vue.toasted.show(notif, { 
+        theme: "bubble",
+        position: "top-right", 
+        duration : 5000
+     })
+    })
 
-    });
+    store.commit('SET_SOCKET', socket)
   },
 })
