@@ -3,10 +3,15 @@
 
         <div v-if="userinfo" id="left">
 			<img v-if="userinfo.profile_pics" v-bind:src="`http://localhost:3000/${userinfo.profile_pics[imgNb]}`" @click="nextImg()" alt="avatar">
-            <div v-if="this.$store.state.user && this.$store.state.user.id !== userinfo.id">
+            <div v-if="this.$store.state.user && this.$store.state.user.id !== userinfo.id" class="button-profile">
+                <!-- Like user -->
                 <button v-if="this.$store.state.user.likes && this.$store.state.user.likes.includes(userinfo.id.toString())" @click="likeRemove(userinfo.id)" style="background-color: #ed5673">Remove Like</button>
                 <button v-else-if="!userinfo.likes || !userinfo.likes.includes(this.$store.state.user.id)" @click="like(userinfo.id)" style="background-color: #10ac84">Like</button>
                 <button v-else-if="userinfo.likes && userinfo.likes.includes(this.$store.state.user.id)" @click="like(userinfo.id)" style="background-color: #f368e0">Like back</button>
+                <!-- Block user -->
+                <button v-if="true" @click="blockUser(userinfo.id)" style="background-color: #FD7272">Block User</button>
+                <!-- Report user -->
+                <button v-if="true" @click="reportUser(userinfo.id)" style="background-color: #FD7272">Report User</button>
             </div>
         </div>
 
@@ -105,7 +110,49 @@ export default {
             else
                 this.imgNb = 0;
             console.log(this.imgNb);
-        }
+        },
+        //BLOCK USER
+        async blockUser(id) {
+            console.log('blockuser()', id);
+
+            // try {
+            //     const res = await this.$api.get(`/user/like/${id}`, {withCredentials: true});
+
+            //     if (res.data.success) {
+            //         this.$store.commit('SET_USER', {...this.$store.state.user, likes: res.data.likes})
+            //         console.log(id)
+
+            //         console.log(this.$store.state.user.likes.includes(id.toString()))
+            //     }
+            //     else {
+            //         alert('Server error.')
+            //     }
+            // } catch (ex) {
+            //     alert('Server error.')
+            //     console.log(ex)
+            // }  
+        },
+        //REPORT USER
+        async reportUser(id) {
+            console.log('reportuser()', id);
+
+            try {
+                const res = await this.$api.get(`/user/like/${id}`, {withCredentials: true});
+
+                if (res.data.success) {
+                    this.$store.commit('SET_USER', {...this.$store.state.user, likes: res.data.likes})
+                    console.log(id)
+
+                    console.log(this.$store.state.user.likes.includes(id.toString()))
+                }
+                else {
+                    alert('Server error.')
+                }
+            } catch (ex) {
+                alert('Server error.')
+                console.log(ex)
+            }  
+        },
     },
 	mounted(){
         this.fetchSglUsers(this.$route.params.id);
@@ -147,6 +194,11 @@ section#profil div#left img {
     cursor: pointer;
 }
 
+section#profil div#left div.button-profile {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
 section#profil div#left button {
     padding: 10px;
     color: #fff;

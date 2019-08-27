@@ -13,7 +13,6 @@
 					<span></span>
 					<span></span>
 				</div>
-				<p>menu</p>
 			</div>
 
 			<!-- Matcha logo -->
@@ -110,7 +109,7 @@ header#header {
 header#header div#open-nav {
     display: flex;
     align-items: center;
-    padding: 0 2em;
+    padding: 0 30px;
     border-right: 2px solid #ffffff14;
     cursor: pointer;
     z-index: 9;
@@ -183,6 +182,13 @@ header a.logo img {
     height: 55px;
 }
 
+/* /// RESPONSIVE //// */
+@media only screen and (max-width: 800px) {
+  header a.logo {
+    display: none;
+    }
+}
+
 /*****************************************************************
 	RIGHT
 *****************************************************************/
@@ -230,7 +236,7 @@ header div.account {
     display: flex;
     align-items: center;
     cursor: pointer;
-    padding: 0 calc(2% + 10px);
+    padding: 0 15px;
 }
 header div.account img {
     border-radius: 100%;

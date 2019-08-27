@@ -193,8 +193,8 @@ section#match .container-swipe{
 
 /********* MAIN CARD *********/
 section#match .container-swipe .card{
-    height: 500px;
-    width: 440px;
+    height: 360px;
+    width: 320px;
     background: #fff;
     border: 20px solid #fff;
     border-radius: 60px;
@@ -214,7 +214,7 @@ section#match .container-swipe .card{
 /* next card */
 section#match .container-swipe .card-next{
     top: 46%;
-    width: 420px;
+    width: 320px;
 }
 
 /********* INFO IN CARD *********/
