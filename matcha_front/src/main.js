@@ -8,9 +8,10 @@ import VueCookies from 'vue-cookies'
 import store from './store'
 import io from 'socket.io-client';
 import Toasted from 'vue-toasted';
-
+import BasicVueChat from 'basic-vue-chat'
 
 Vue.use(VueCookies)
+Vue.use(BasicVueChat)
 
 //Toasted Notif
 Vue.use(Toasted, {

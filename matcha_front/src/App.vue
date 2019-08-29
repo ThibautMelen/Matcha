@@ -3,6 +3,9 @@
 
     <comp-header v-if="!this.$store.state.loading" :userInfos="this.$store.state.user"/>
     <router-view v-if="!this.$store.state.loading" :userInfos="this.$store.state.user"/>
+    <basic-vue-chat />
+
+    <!-- //AJOUTER LE FOOTER !!! -->
     <!-- <comp-footer/> -->
 
   </div>
