@@ -115,6 +115,8 @@ module.exports = {
             console.log(likes)
             res.status(200).json({success: true, likes: likes.split(',')})
 
+            util.promisify(req.db.query).bind(req.db)('UPDATE users SET fame = fame + 50 WHERE id = ?', [req.params.id]);
+
             let likedUser = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users WHERE id = ?', [req.params.id]);
 
             if (likedUser[0] && likedUser[0].sid) {
@@ -165,6 +167,8 @@ module.exports = {
 
             res.status(200).json({success: true, likes: likes.split(',')})
 
+            util.promisify(req.db.query).bind(req.db)('UPDATE users SET fame = fame - 50 WHERE id = ?', [req.params.id]);
+
             let likedUser = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users WHERE id = ?', [req.params.id]);
 
             if (likedUser[0] && likedUser[0].sid && likedUser[0].likes && likedUser[0].likes.split(',').includes(user[0].id.toString())) {
@@ -207,6 +211,8 @@ module.exports = {
             }
 
             res.status(200).json({success: true})
+
+            util.promisify(req.db.query).bind(req.db)('UPDATE users SET fame = fame + 5 WHERE id = ?', [req.params.id]);
         } catch (err) {
             console.error(err)
             return res.status(203).json({success: false})
@@ -226,6 +232,10 @@ module.exports = {
             }
 
             const getDistanceFromLatLonInKm = (lat1,lon1,lat2,lon2) => {
+                console.log('lat1',lat1)
+                console.log('lat2',lat2)
+                console.log('lon1',lon1)
+                console.log('lon2',lon2)
                 var R = 6371;
                 var dLat = deg2rad(lat2-lat1);
                 var dLon = deg2rad(lon2-lon1);
@@ -241,18 +251,19 @@ module.exports = {
 
             let current_user = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users WHERE id = ?', req.user.id)
 
+
+
+
             let users = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users');
 
             let filteredUsers = users.filter((v) => {
                 if (req.body.search) {
                     if (!(v.username && v.username.match(new RegExp(req.body.search, 'i'))) && !(v.bio && v.bio.match(new RegExp(req.body.search, 'i')))) {
-                        console.log('ya')
                         return false
                     }
                 }
                 if (req.body.ageRange1 !== undefined && req.body.ageRange2 !== undefined) {
-                    if (v.age < parseInt(req.body.ageRange1) || v.age > parseInt(req.body.ageRange2)) {
-                        console.log('ytqa')
+                    if (v.age < parseInt(req.body.ageRange1) || (parseInt(req.body.ageRange2) < 200 && v.age > parseInt(req.body.ageRange2))) {
                         return false
                     }
                 }
@@ -262,17 +273,18 @@ module.exports = {
                         return false
                     }
                 }
-                if (req.body.kmRange) {
-                    let dist = getDistanceFromLatLonInKm(current_user.lat, current_user.lng, v.lat, v.lng)
+                if (req.body.kmRange && req.body.kmRange < 100) {
+                    console.log('yo')
+                    let dist = getDistanceFromLatLonInKm(parseFloat(current_user[0].lat), parseFloat(current_user[0].lng), parseFloat(v.lat), parseFloat(v.lng))
+                    console.log(`${dist} > ${req.body.kmRange}`)
 
                     if (dist > parseInt(req.body.kmRange)) {
-                        console.log('yta')
                         return false
                     }
                 }
                 if (req.body.interests && req.body.interests.length > 0) {
                     let userInterests = v.interests.split(',')
-                    let filteredInterests = req.body.interests.filter(interest => userInterests.includes(interest))
+                    let filteredInterests = req.body.interests.filter(interest => userInterests.includes(interest.text))
 
                     if (!filteredInterests || filteredInterests.length < 1) {
                         return false
@@ -281,7 +293,18 @@ module.exports = {
                 return true
             })
 
-            return res.status(200).json({success: true, users: filteredUsers})
+            let foundUsers = filteredUsers.map(u => {
+                u.profile_pics = u.profile_pics.split(',')
+                u.interests = u.interests.split(',')
+                u.sexual_orientations = u.sexual_orientations.split(',')
+                if (u.likes) {
+                    u.likes = u.likes.split(',')
+                }
+
+                return u
+            })
+
+            return res.status(200).json({success: true, users: foundUsers})
         } catch (err) {
             console.error(err)
             return res.status(203).json({success: false})

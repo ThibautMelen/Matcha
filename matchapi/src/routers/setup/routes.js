@@ -15,6 +15,10 @@ module.exports = () => {
     //TABLE
     // Create table : interests
     router.get('/table_interests', methods.table_interests);
+    
+    //TABLE
+    // Create table : lost_pass
+    router.get('/table_lost_pass', methods.table_lost_pass);
 
     return router;
 }

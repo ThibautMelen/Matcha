@@ -131,6 +131,8 @@
 
             <a class="input-group" :href="`https://www.latlong.net/c/?lat=${this.formdata.lat}&long=${this.formdata.lng}`" target="_blank">View the Map</a>
 
+            <a class="input-group" style="cursor:pointer" @click="getLocalisation()">Get my localisation</a>
+
             <div class="input-group">
                 <input type="submit" value="Update Info">
             </div>
@@ -196,10 +198,11 @@ export default {
                 type: this.formdata.type,
                 interests: this.tags.map(v => ({text: v.text})),
                 sexual_orientations: this.formdata.sexual_orientations,
-                lng: this.formdata.lat,
-                lat: this.formdata.lng,
+                lng: this.formdata.lng,
+                lat: this.formdata.lat,
                 profile_pics: this.profile_pics
             }
+            console.log(data)
 
             // AXIOS BDD
             try {
@@ -221,6 +224,24 @@ export default {
             } catch (ex) {
                 console.log(ex);
             }
+        },
+        getLocalisation() {
+            console.log('yo')
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    console.log('got it')
+                    console.log('Latitude : ', position.coords.latitude)
+                    console.log('Longitude : ', position.coords.longitude)
+                    console.log(`La précision est de ${position.coords.accuracy} mètres.`)
+
+                    this.formdata.lat = position.coords.latitude
+                    this.formdata.lng = position.coords.longitude
+                },
+                (positionError) => {
+                    console.log(positionError)
+                },
+                {timeout:20000}
+            )            
         },
         //FETCH INTERESET
         async fetchInterest () {
@@ -286,6 +307,10 @@ export default {
     mounted() {
         this.fetchInterest();
         this.checkCo();
+    },
+    updated() {
+        console.log('lat', this.formdata.lat)
+        console.log('lng', this.formdata.lng)
     },
 
 }

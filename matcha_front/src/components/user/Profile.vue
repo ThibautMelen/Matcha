@@ -6,8 +6,8 @@
             <div v-if="this.$store.state.user && this.$store.state.user.id !== userinfo.id" class="button-profile">
                 <!-- Like user -->
                 <button v-if="this.$store.state.user.likes && this.$store.state.user.likes.includes(userinfo.id.toString())" @click="likeRemove(userinfo.id)" style="background-color: #ed5673">Remove Like</button>
+                <button v-else-if="userinfo.likes && userinfo.likes.includes(this.$store.state.user.id.toString())" @click="like(userinfo.id)" style="background-color: #f368e0">Like back</button>
                 <button v-else-if="!userinfo.likes || !userinfo.likes.includes(this.$store.state.user.id)" @click="like(userinfo.id)" style="background-color: #10ac84">Like</button>
-                <button v-else-if="userinfo.likes && userinfo.likes.includes(this.$store.state.user.id)" @click="like(userinfo.id)" style="background-color: #f368e0">Like back</button>
                 <!-- Block user -->
                 <button v-if="true" @click="blockUser(userinfo.id)" style="background-color: #FD7272">Block User</button>
                 <!-- Report user -->

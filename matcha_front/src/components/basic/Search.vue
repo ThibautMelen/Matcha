@@ -2,20 +2,21 @@
 
     <!-- SEARCH -->
     <section v-if="this.$store.state.user" id="search">
+        <!-- AGE RANGE -->
         <div class="range">
-            <p>Search people betwen {{ageRange1}} and {{ageRange2}} years old</p>
-            <input type="range" min="16" max="700" step="1" :value="ageRange1" class="slider" @change="(e) => {
-                if (e.target.value < this.ageRange2) {
-                    this.ageRange1 = e.target.value
+            <p>Search people betwen {{ageRange1}} and {{ageRange2 === 200 ? `200+` : ageRange2}} years old</p>
+            <input type="range" min="16" max="200" step="1" :value="ageRange1" class="slider" @change="(e) => {
+                if (parseInt(e.target.value) < parseInt(this.ageRange2)) {
+                    this.ageRange1 = parseInt(e.target.value)
                 }
                 else {
                     this.ageRange1 = parseInt(this.ageRange2) - 1
                 }
                 this.search()
                 }">
-            <input type="range" min="16" max="700" step="1" :value="ageRange2" class="slider" @change="(e) => {
-                if (e.target.value > this.ageRange1) {
-                    this.ageRange2 = e.target.value
+            <input type="range" min="16" max="200" step="1" :value="ageRange2" class="slider" @change="(e) => {
+                if (parseInt(e.target.value) > parseInt(this.ageRange1)) {
+                    this.ageRange2 = parseInt(e.target.value)
                 }
                 else {
                     this.ageRange2 = parseInt(this.ageRange1) + 1
@@ -23,20 +24,21 @@
                 this.search()
                 }">
         </div>
+        <!-- FAME RANGE -->
         <div class="range">
-            <p>Search people with popularity betwen {{popRange1}} and {{popRange2}}</p>
-            <input type="range" min="0" max="1000" step="1" :value="popRange1" class="slider" @change="(e) => {
-                if (e.target.value < this.popRange2) {
-                    this.popRange1 = e.target.value
+            <p>Search people with popularity betwen {{popRange1}} and {{popRange2 === 1000 ? `1000+` : popRange2}}</p>
+            <input type="range" min="1" max="1000" step="1" :value="popRange1" class="slider" @change="(e) => {
+                if (parseInt(e.target.value) < parseInt(this.popRange2)) {
+                    this.popRange1 = parseInt(e.target.value)
                 }
                 else {
                     this.popRange1 = parseInt(this.popRange2) - 1
                 }
                 this.search()
                 }">
-            <input type="range" min="0" max="1000" step="1" :value="popRange2" class="slider" @change="(e) => {
-                if (e.target.value > this.popRange1) {
-                    this.popRange2 = e.target.value
+            <input type="range" min="1" max="1000" step="1" :value="popRange2" class="slider" @change="(e) => {
+                if (parseInt(e.target.value) > parseInt(this.popRange1)) {
+                    this.popRange2 = parseInt(e.target.value)
                 }
                 else {
                     this.popRange2 = parseInt(this.popRange1) + 1
@@ -44,16 +46,23 @@
                 this.search()
                 }">
         </div>
+        <!-- KM RANGE -->
         <div class="range">
-            <p>Distance {{kmRange}}km</p>
-            <input type="range" min="1" max="1000" step="1" value="35" class="slider" v-model="kmRange">
+            <p>Distance {{kmRange === 100 ? `100+` : kmRange}}km</p>
+            <input type="range" min="1" max="100" step="1" :value="kmRange" class="slider" @change="(e) => {
+                this.kmRange = parseInt(e.target.value)
+                this.search()
+            }">
         </div>
         <div class="range">
             <vue-tags-input
             v-model="tag"
             :tags="tags"
             :autocomplete-items="filteredItems"
-            @tags-changed="newTags => tags = newTags"
+            @tags-changed="newTags => {
+                tags = newTags
+                this.search()
+            }"
             />
         </div>
         <input :value="searchValue" type="text"  maxlength="15" placeholder="Search..." class="searchbar" @change="(e) => {
@@ -62,8 +71,11 @@
                 }">
         <div id="listUser">
             <div v-for="(item, index) in items" :key="index">
-                <img src="http://localhost:3000/public/bf00cbe9f7808ec597efb2e00f2cbf6e.jpg" alt="avatar">
-                <p>{{ item.username }} {{index}}</p>
+                <router-link :to="{ name: 'ProfileComp', params: { id: item.id}}">
+                    <img v-bind:src="`http://localhost:3000/${item.profile_pics[0]}`" alt="avatar">
+                    <p>{{ item.username }} {{index}}</p>
+                </router-link>
+
             </div>
         </div>
     </section>
@@ -81,15 +93,15 @@ export default {
             items: [
             ],
              // INTEREST LIST
-            tags: this.$store.state.user ? this.$store.state.user.interests : [],
+            tags: [],
             tag: '',
             autocompleteItems: [],
             //FILTER RANGE
-            ageRange1 : 135,
-            ageRange2 : 450,
-            popRange1 : 35,
-            popRange2 : 75,
-            kmRange: 0,
+            ageRange1 : 16,
+            ageRange2 : 200,
+            popRange1 : 0,
+            popRange2 : 1000,
+            kmRange: 100,
             searchValue: ''
         }
     },
@@ -117,9 +129,11 @@ export default {
                     interests: this.tags,
                     search: this.searchValue
                 }
+                console.log(body.ageRange1)
                 const res = await this.$api.post(`/user/search`, body, {withCredentials: true});
 
                 if (res.data.success) {
+                    console.log('Found')
                     this.items = res.data.users
                 }
             } catch (ex) {
@@ -138,6 +152,9 @@ export default {
         console.log(`mounted`);
         this.fetchInterest();
         this.search()
+    },
+    updated() {
+        console.log('Updated')
     },
 
 }
@@ -248,12 +265,12 @@ div#listUser div{
     cursor: pointer;
 }
 
-div#listUser div > img{
+div#listUser div a > img{
     width: 220px;
     height: 220px;
     border-radius: 60px;
 }
-div#listUser div > p{
+div#listUser div a > p{
     font-size: 20px;
     color: #424242;
     text-align: center;

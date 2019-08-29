@@ -27,6 +27,8 @@
                 <label>Password</label>
             </div>
 
+            <router-link to="/resetpass" class="input-group">Forgot Password ?</router-link>
+
             <div class="input-group">
                 <input type="submit" value="Se connecter">
             </div>

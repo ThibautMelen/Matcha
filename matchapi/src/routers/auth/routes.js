@@ -17,6 +17,9 @@ module.exports = () => {
 
     router.get('/validate/:key', methods.validate);
 
+    router.get('/lost_pass/:email', methods.lost_pass);
+
+    router.post('/reset_pass', methods.reset_pass);
 
     return router;
 };

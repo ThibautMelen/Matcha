@@ -3,6 +3,8 @@ import Router from 'vue-router'
 
 import LoginComp from '@/components/auth/Login.vue';
 import RegisterComp from '@/components/auth/Register.vue';
+import Resetpass from '@/components/auth/Resetpass.vue';
+import Resetpass2 from '@/components/auth/Resetpass2.vue';
 import HomeComp from '@/components/basic/Home.vue';
 import ProfileComp from '@/components/user/Profile.vue';
 import NotifComp from '@/components/user/Notif.vue';
@@ -30,6 +32,18 @@ export default new Router({
       path: '/register',
       name: 'RegisterComp',
       component: RegisterComp
+    },
+    {
+      path: '/resetpass',
+      name: 'Resetpass',
+      component: Resetpass,
+      
+    },
+    {
+      path: '/resetpass2',
+      name: 'Resetpass2',
+      component: Resetpass2,
+      
     },
     {
       path: '/profile/:id',

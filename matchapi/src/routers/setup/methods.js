@@ -53,5 +53,20 @@ module.exports = {
             console.log(results);
             res.send('Interests table created...');
         });
+    },
+
+    table_lost_pass: (req, res) => {
+        let sql =   "CREATE TABLE `lost_pass` ( " +
+                    "`id` int PRIMARY KEY NOT NULL AUTO_INCREMENT," +
+                    "`code` varchar(255) NOT NULL," +
+                    "`user_id` int(11) NOT NULL," +
+                    "`done` int(11) NOT NULL" +
+                    ") ENGINE=InnoDB DEFAULT CHARSET=utf8";
+
+        req.db.query(sql, (err, results) => {
+            if(err) throw err;
+            console.log(results);
+            res.send('Lost_pass table created...');
+        });
     }
 }

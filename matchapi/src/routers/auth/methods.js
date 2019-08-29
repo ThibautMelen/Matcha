@@ -297,7 +297,7 @@ module.exports = {
                 type: await utils.validator(req.body.type, {rules: ['string'], formats: ['trim', 'lowercase'], enum: ['male','woman','alien','cyborg','giant','minks','elve','troll']}),
                 profile_pics: req.body.profile_pics && req.body.profile_pics.length > 0 ? await utils.validator(req.body.profile_pics, {rules: ['array'], min: 1, max: 5}) : null,
                 lat: await utils.validator(parseFloat(typeof req.body.lat === 'string' ? req.body.lat.replace(',', '.') : req.body.lat), {rules: ['number']}),
-                lng: await utils.validator(parseFloat(typeof req.body.lat === 'string' ? req.body.lat.replace(',', '.') : req.body.lat), {rules: ['number']}),
+                lng: await utils.validator(parseFloat(typeof req.body.lng === 'string' ? req.body.lng.replace(',', '.') : req.body.lng), {rules: ['number']}),
                 interests: await utils.validator(req.body.interests, {rules: ['array'], min: 0, max: 255}),
                 sexual_orientations: await utils.validator(req.body.sexual_orientations, {rules: ['array'], min: 1, max: 255}),
             }
@@ -439,6 +439,77 @@ module.exports = {
         }
         else {
             res.redirect('http://localhost:8080')
+        }
+    },
+
+    lost_pass: async (req, res) => {
+        if (!req.params.email) {
+            return res.status(400).json(false);
+        }
+
+        try {
+            const data = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users WHERE email = ?', req.params.email)
+
+            if (data && data[0]) {
+                let code = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+
+                let pass_req = {
+                    code,
+                    user_id: data[0].id,
+                    done: 0
+                }
+                
+                await util.promisify(req.db.query).bind(req.db)('INSERT INTO lost_pass SET ?', pass_req)
+
+                await utils.transporter.sendMail({
+                    from: 'Matcha <test.dev.basilic@gmail.com>',
+                    to: data[0].email,
+                    subject: 'Reset your password',
+                    text: `
+                    http://localhost:8080/resetpass2?id=${data[0].id}&code=${code}
+                    `
+                })
+                console.log(`Mail sent to ${data[0].email}`)
+            }
+            return res.status(200).json({success: true});
+        }
+        catch(err) {
+            console.error(err)
+            return res.status(520).json({ error: 'Unknown error 0006' });
+        }
+    },
+
+    reset_pass: async (req, res) => {
+        let body;
+        try {
+            body = {
+                password: await utils.validator(req.body.password, {rules: ['string'], regex: /^[a-zA-Z0-9]{8,}$/, formats: ['trim'], max: 255}),
+                id: await utils.validator(req.body.id, {rules: ['number']}),
+                code: await utils.validator(req.body.code, {rules: ['string']})
+            }
+        } catch (err) {
+            return res.status(203).json({error: 'validation_error', message: err});
+        }
+
+        try {
+            let pass_req = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM lost_pass WHERE user_id = ? AND code = ? AND done = 0', [body.id, body.code])
+
+            if (pass_req && pass_req[0]) {
+                let new_pass = await bcrypt.hash(body.password, saltRounds)
+
+                await util.promisify(req.db.query).bind(req.db)('UPDATE users SET pass = ? WHERE id = ?', [new_pass, body.id])
+
+                await util.promisify(req.db.query).bind(req.db)('UPDATE lost_pass SET done = 1 WHERE id = ?', [pass_req[0].id])
+
+                return res.status(200).json({success: true});
+            }
+            else {
+                return res.status(203).json({error: 'req_no', message: `Reset password request do not exist`});
+            }
+        }
+        catch(err) {
+            console.error(err)
+            return res.status(520).json({ error: 'Unknown error 0006' });
         }
     }
 }
