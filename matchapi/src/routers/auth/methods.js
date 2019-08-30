@@ -37,7 +37,20 @@ module.exports = {
                         fame: data[0],
                     }
 
-                    res.status(200).json({success: true, userInfos})
+                    const allUsers = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users')
+
+                    let matches = allUsers.filter(user => {
+                        if (userInfos.likes.includes(user.id.toString())) {
+                            let likes = user.likes.split(',')
+                            if (likes.includes(userInfos.id.toString())) {
+                                return true
+                            }
+                        }
+                        return false
+                    })
+                    .map(user => ({...user, feed: []}))
+
+                    res.status(200).json({success: true, userInfos, matches})
                 }
                 else {
                     res.status(200).json({success: false})

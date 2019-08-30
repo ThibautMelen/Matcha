@@ -10,11 +10,15 @@ const store = new Vuex.Store({
         loading: true,
         socket: null,
         notifs: [],
-        newNotif: false
+        newNotif: false,
+        matches: []
     },
     mutations: {
         SET_USER (state, user) {
             state.user = user
+        },
+        SET_MATCHES (state, user) {
+            state.matches = matches
         },
         SET_LOADING (state, loading) {
             state.loading = loading

@@ -8,10 +8,8 @@ import VueCookies from 'vue-cookies'
 import store from './store'
 import io from 'socket.io-client';
 import Toasted from 'vue-toasted';
-import BasicVueChat from 'basic-vue-chat'
 
 Vue.use(VueCookies)
-Vue.use(BasicVueChat)
 
 //Toasted Notif
 Vue.use(Toasted, {
@@ -46,6 +44,7 @@ new Vue({
       .then(res => {
         if (res.data.userInfos) {
           store.commit('SET_USER', res.data.userInfos)
+          store.commit('SET_MATCHES'. res.data.matches)
           store.commit('SET_LOADING', false)
         }
         else {
