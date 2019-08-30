@@ -3,13 +3,14 @@
     <!-- CHAT -->
     <section id="sectChat">
         <aside>
-            <ul id="example-2">
-                <li @click="changeFeed" v-for="(item, index) in users" :key="index"> {{ item.name }}</li>
+            <ul v-if="$store.state.matches && $store.state.matches.length > 0" id="example-2">
+                <li  v-for="(item, index) in $store.state.matches" :key="index"> {{ item.username }}</li>
             </ul>
+            <span v-else>Vous n'avez pas d'amis.</span>
         </aside>
-        <div id="chat">
+        <div v-if="Boolean(selectedUser)" id="chat">
             <h1>Chat</h1>
-            <basic-vue-chat :initial-feed="feed" />
+            <basic-vue-chat />
         </div>
     </section>
 
@@ -17,7 +18,7 @@
 
 
 <script>
-import BasicVueChat from 'basic-vue-chat'
+import BasicVueChat from '../basic-vue-chat/BasicVueChat.vue'
 
 export default {
     components : {
@@ -25,34 +26,14 @@ export default {
     },
     data(){
         return {
-            feed: [
-                {
-                    id: 2,
-                    author: 'Person',
-                    contents: 'hi there',
-                    date: '16:30'
-                },
-                {
-                    id: 0,
-                    author: 'Me',
-                    contents: 'hi fils de pute',
-                    date: '16:30'
-                },
-                {
-                    id: 0,
-                    author: 'Mfsafae',
-                    contents: 'ta mere tu sais pas faire un composant fuck vue vive react où on peut changer le style',
-                    date: '16:30'
-                },
-            ],
-            users: [
-                { name: 'Utilisatur 1' },
-                { name: 'Utilisateur 2' }
-            ]
+            selectedUser: null
         }
     },
     methods:{
     },
+    mounted () {
+        console.log(this.$store.state.matches)
+    }
 }
 </script>
 
@@ -69,28 +50,37 @@ section#sectChat div#chat {
     flex-direction: column;
     align-items: center;
     justify-content: start;
-    background: #fff;
     width: 100%;
-    margin: 40px 85px;
     border-radius: 25px;
     padding: 50px 0;
+}
+section#sectChat div#chat h1{
+    margin-bottom: 10px;
 }
 
 
 /* //ASIDE LIST USER */
-section#sectChat aside ul {
+section#sectChat {
     display: flex;
-    background:#37455c;
-    height: 100vh;
-    width: 200px;
-    flex-direction: column;
+    flex-direction: column-reverse;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+section#sectChat aside {
+    display: flex;
+    flex-direction: row;
     padding: 10px;
+    border-radius: 20px;
+    background:#37455c;
+    margin-top: 30px;
+    color: #fff;
 }
 
 section#sectChat aside ul li{
     color: #fff;
     padding: 10px;
-    font-size: 20px;
+    font-size: 15px;
     cursor: pointer;
 }
 

@@ -1,0 +1,15 @@
+.window {
+  @include flex(column);
+  @include box-shadow(0 0 2px $madison);
+  background-color: white;
+  width: 100%;
+  height: $window-height;
+  border: 0px solid transparent;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.basic-vue-chat {
+  width: 90%;
+  max-width: 1000px;
+}

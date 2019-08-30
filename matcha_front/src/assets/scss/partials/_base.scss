@@ -1,0 +1,17 @@
+@import "../modules/all";
+
+.base {
+  font-family: $font-family;
+  font-weight: $base-font-weight;
+  font-size: $base-font-size;
+  color: $dark-text-color;
+  width: 100%;
+  min-width: 350px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}

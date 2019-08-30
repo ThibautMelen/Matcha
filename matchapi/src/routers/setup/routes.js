@@ -20,5 +20,7 @@ module.exports = () => {
     // Create table : lost_pass
     router.get('/table_lost_pass', methods.table_lost_pass);
 
+    router.get('/create_users', methods.create_users)
+
     return router;
 }

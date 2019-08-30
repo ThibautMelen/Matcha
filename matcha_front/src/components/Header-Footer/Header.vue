@@ -25,12 +25,12 @@
 
             <div v-if="userInfos" class="right">
                 <!-- Chat -->
-                <router-link id="notif" tag="div" to="/chat">
+                <router-link class="notif" tag="div" to="/chat">
                     <div v-if="true"></div>
-                    <svg id="pikomit_notif" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480.12 500"><path d="M181.51,431.49a71.37,71.37,0,0,0,51.06,68.15h0a71,71,0,0,0,90.94-68.14v-4h-142Z" transform="translate(-12.44 -2.5)"></path><path d="M488.73,364.77h0a30.89,30.89,0,0,0-1.73-2.65l.25-.23-50.83-50.83V186.45l-.05-6.43h-.09A185.65,185.65,0,0,0,399.67,76.2,183.85,183.85,0,0,0,76.08,134.82,184.07,184.07,0,0,0,68.82,180h-.23v131L20.67,359l-2.89,2.92.24.22a30.89,30.89,0,0,0-1.73,2.65A28.64,28.64,0,0,0,37,407.44v.29H468v-.28a28.64,28.64,0,0,0,20.73-42.67Z" transform="translate(-12.44 -2.5)"></path></svg>
+                    <svg id="pikomit_msg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480.12 500"><path d="M181.51,431.49a71.37,71.37,0,0,0,51.06,68.15h0a71,71,0,0,0,90.94-68.14v-4h-142Z" transform="translate(-12.44 -2.5)"></path><path d="M488.73,364.77h0a30.89,30.89,0,0,0-1.73-2.65l.25-.23-50.83-50.83V186.45l-.05-6.43h-.09A185.65,185.65,0,0,0,399.67,76.2,183.85,183.85,0,0,0,76.08,134.82,184.07,184.07,0,0,0,68.82,180h-.23v131L20.67,359l-2.89,2.92.24.22a30.89,30.89,0,0,0-1.73,2.65A28.64,28.64,0,0,0,37,407.44v.29H468v-.28a28.64,28.64,0,0,0,20.73-42.67Z" transform="translate(-12.44 -2.5)"></path></svg>
                 </router-link>
                 <!-- Notif -->
-                <router-link id="notif" tag="div" to="/notification">
+                <router-link class="notif" tag="div" to="/notification">
                     <div v-if="this.$store.state.newNotif"></div>
                     <svg id="pikomit_notif" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480.12 500"><path d="M181.51,431.49a71.37,71.37,0,0,0,51.06,68.15h0a71,71,0,0,0,90.94-68.14v-4h-142Z" transform="translate(-12.44 -2.5)"></path><path d="M488.73,364.77h0a30.89,30.89,0,0,0-1.73-2.65l.25-.23-50.83-50.83V186.45l-.05-6.43h-.09A185.65,185.65,0,0,0,399.67,76.2,183.85,183.85,0,0,0,76.08,134.82,184.07,184.07,0,0,0,68.82,180h-.23v131L20.67,359l-2.89,2.92.24.22a30.89,30.89,0,0,0-1.73,2.65A28.64,28.64,0,0,0,37,407.44v.29H468v-.28a28.64,28.64,0,0,0,20.73-42.67Z" transform="translate(-12.44 -2.5)"></path></svg>
                 </router-link>
@@ -230,13 +230,16 @@ header div.right {
     display: flex;
     align-items: center;
 }
-header div.right #notif {
+header div.right .notif {
     width: 27px;
     fill: #fff;
     height: 27px;
     cursor: pointer;
 }
-header div.right #notif > div {
+header div.right .notif:nth-child(1) {
+    margin-right: 20px;
+}
+header div.right .notif > div {
     width: 22px;
     height: 22px;
     background: #ee5659;
