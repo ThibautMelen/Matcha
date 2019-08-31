@@ -304,6 +304,11 @@ export default {
             });
         },
     },
+    created() {
+        if (!this.$store.state.user) {
+            this.$router.push('/login')
+        }
+    },
     mounted() {
         this.fetchInterest();
         this.checkCo();

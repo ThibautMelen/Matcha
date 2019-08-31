@@ -105,6 +105,11 @@ export default {
             searchValue: ''
         }
     },
+    created() {
+        if (!this.$store.state.user) {
+            this.$router.push('/login')
+        }
+    },
     components: {
         VueTagsInput,
     },

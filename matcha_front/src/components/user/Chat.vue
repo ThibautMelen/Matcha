@@ -4,13 +4,13 @@
     <section id="sectChat">
         <aside>
             <ul v-if="$store.state.matches && $store.state.matches.length > 0" id="example-2">
-                <li  v-for="(item, index) in $store.state.matches" :key="index"> {{ item.username }}</li>
+                <li v-for="(item, index) in $store.state.matches" :key="index" :style="selectedUser && selectedUser.id === item.id ? 'text-decoration: underline;' : 'text-decoration: none;'" @click="() => selectedUser = item"> {{ item.username }}</li>
             </ul>
             <span v-else>Vous n'avez pas d'amis.</span>
         </aside>
         <div v-if="Boolean(selectedUser)" id="chat">
             <h1>Chat</h1>
-            <basic-vue-chat />
+            <basic-vue-chat :initialAuthorId="$store.state.user.id" :initialFeed="selectedUser.feed" :title="selectedUser.username" @newOwnMessage="onNewOwnMessage" />
         </div>
     </section>
 
@@ -24,12 +24,33 @@ export default {
     components : {
         BasicVueChat
     },
+    created() {
+        if (!this.$store.state.user) {
+            this.$router.push('/login')
+        }
+    },
     data(){
         return {
-            selectedUser: null
+            selectedUser: null,
+            message: {}
         }
     },
     methods:{
+        async onNewOwnMessage (message) {
+            if (!this.selectedUser) {
+                return
+            }
+            console.log(message)
+
+            const data = {
+                receiverId: this.selectedUser.id,
+                message
+            }
+
+            let res = await this.$api.post('/user/message', data, {withCredentials: true});
+
+            console.log(res)
+        }
     },
     mounted () {
         console.log(this.$store.state.matches)

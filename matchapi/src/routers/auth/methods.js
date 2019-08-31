@@ -35,12 +35,13 @@ module.exports = {
                         lng: data[0].lng,
                         last_co: today.toLocaleDateString("en-GB"),
                         fame: data[0],
+                        blocks: data[0].blocks ? data[0].blocks.split(',') : null
                     }
 
                     const allUsers = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users')
 
                     let matches = allUsers.filter(user => {
-                        if (userInfos.likes.includes(user.id.toString())) {
+                        if (user.likes && userInfos.likes && userInfos.likes.includes(user.id.toString())) {
                             let likes = user.likes.split(',')
                             if (likes.includes(userInfos.id.toString())) {
                                 return true
@@ -123,9 +124,23 @@ module.exports = {
                     lng: data[0].lng,
                     last_co: today.toLocaleDateString("en-GB"),
                     fame: data[0],
+                    blocks: data[0].blocks ? data[0].blocks.split(',') : null
                 }
 
-                res.status(200).json({ success: 'OK', token, userInfos });
+                const allUsers = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users')
+
+                let matches = allUsers.filter(user => {
+                    if (user.likes && userInfos.likes && userInfos.likes.includes(user.id.toString())) {
+                        let likes = user.likes.split(',')
+                        if (likes.includes(userInfos.id.toString())) {
+                            return true
+                        }
+                    }
+                    return false
+                })
+                .map(user => ({...user, feed: []}))
+
+                res.status(200).json({ success: 'OK', token, userInfos, matches });
 
                 //Change To Online 1
                 try {
@@ -267,7 +282,7 @@ module.exports = {
         //Send verification emal
         try {
             await utils.transporter.sendMail({
-                from: 'Matcha <test.dev.basilic@gmail.com>',
+                from: 'Matcha <matcha42xn@gmail.com>',
                 to: body.email,
                 subject: 'Welcome to Matcha',
                 text: `
@@ -401,6 +416,7 @@ module.exports = {
                     lat: data[0].lat,
                     lng: data[0].lng,
                     fame: data[0],
+                    blocks: data[0].blocks ? data[0].blocks.split(',') : null
                 }
 
                 res.status(200).json({success: true, userInfos})
@@ -416,7 +432,7 @@ module.exports = {
         //Send verification emal
         try {
             await utils.transporter.sendMail({
-                from: 'Matcha <test.dev.basilic@gmail.com>',
+                from: 'Matcha <matcha42xn@gmail.com>',
                 to: body.email,
                 subject: 'New informations',
                 text: `
@@ -475,7 +491,7 @@ module.exports = {
                 await util.promisify(req.db.query).bind(req.db)('INSERT INTO lost_pass SET ?', pass_req)
 
                 await utils.transporter.sendMail({
-                    from: 'Matcha <test.dev.basilic@gmail.com>',
+                    from: 'Matcha <matcha42xn@gmail.com>',
                     to: data[0].email,
                     subject: 'Reset your password',
                     text: `

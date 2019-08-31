@@ -26,12 +26,13 @@ module.exports = {
                     "`mail_key` varchar(32) NOT NULL," +
                     "`lat` DECIMAL(65, 30)," +
                     "`lng` DECIMAL(65, 30)," +
-                    "`interests` varchar(255) NOT NULL," +
-                    "`profile_pics` varchar(255) NOT NULL," +
-                    "`sexual_orientations` varchar(255) NOT NULL," +
+                    "`interests` varchar(999) NOT NULL," +
+                    "`profile_pics` varchar(999) NOT NULL," +
+                    "`sexual_orientations` varchar(999) NOT NULL," +
                     "`confirm` int(11) NOT NULL," +
                     "`online` int(11) NOT NULL," +
-                    "`likes` varchar(255)," +
+                    "`likes` varchar(999)," +
+                    "`blocks` varchar(999)," +
                     "`sid` varchar(255)," +
                     "`fame` int(11)," +
                     "`last_co` varchar(255) NOT NULL" +

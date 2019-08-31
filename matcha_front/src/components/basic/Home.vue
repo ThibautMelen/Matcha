@@ -3,48 +3,37 @@
     <section id="match">
 
         <!-- card -->
-        <div class="container-swipe">
+        <div v-if="cards && cards.length > 0" class="container-swipe">
             <div style="z-index: 3">
                 <Vue2InteractDraggable
-                    v-if="isVisible"
-                    @draggedDown="draggedDown"
+                    v-if="current && isVisible"
                     @draggedLeft="draggedLeft"
-                    @draggedRight="draggedRight"
-                    @draggedUp="draggedUp"
+                    @draggedRight="() => draggedRight(current.id)"
                     :interact-out-of-sight-x-coordinate="500"
                     :interact-max-rotation="15"
                     :interact-x-threshold="200"
                     :interact-y-threshold="200"
                     :interact-event-bus-events="interactEventBusEvents"
                     class="card"
-                    v-bind:style="{ backgroundImage: `url(${current.img})` }"
+                    v-bind:style="{ backgroundImage: `url(http://localhost:3000/${current.profile_pics.split(',')[0]})` }"
                     >
                     <div class="card-info">
-                        <p>{{current.text}}</p>
+                        <p>{{current.username}}</p>
                     </div>
                 </Vue2InteractDraggable>
             </div>
             <div
                 v-if="next"
                 class="card card-next"
-                v-bind:style="{ backgroundImage: `url(${next.img})` }"
+                v-bind:style="{ backgroundImage: `url(http://localhost:3000/${next.profile_pics.split(',')[0]})` }"
                 style="z-index: 2">
                 <div class="card-info">
-                    <p>{{next.text}}</p>
-                </div>
-            </div>
-            <div
-                v-if="index + 2 < cards.length"
-                class="card card-next"
-                v-bind:style="{ backgroundImage: `url(${current.img})` }"
-                style="z-index: 1">
-                <div class="flex flex--center" style="height: 100%">
-                    <p>{{next.text}}</p>
+                    <p>{{next.username}}</p>
                 </div>
             </div>
 
             <!-- buton -->
-            <div id="valid" >
+            <div v-if="current" id="valid" >
                 <input @click="dragLeft()" type="submit" value="NOP">
                 <input @click="dragRight()" type="submit" value="LIKE">
             </div>
@@ -67,18 +56,7 @@ export default {
     data () {
         return {
             isVisible: true,
-            cards: [
-                {
-                    text: 'Margot Robbie',
-                    img: `/static/margot-robbie.jpg`
-                },                {
-                    text: 'Emma Watson',
-                    img: `/static/emma-watson.jpg`
-                },                {
-                    text: 'Shrek',
-                    img: `/static/shrek.jpg`
-                }
-            ],
+            cards: [],
             index: 0,
             interactEventBusEvents: {
                 draggedDown: INTERACT_DRAGGED_DOWN,
@@ -100,12 +78,23 @@ export default {
         }
     },
     methods:{
-        draggedDown() {
-            setTimeout(() => this.isVisible = false, 200);
-            setTimeout(() => {
-                this.index++;
-                this.isVisible = true;
-            }, 300);
+        async like(id) {
+          	try {
+                const res = await this.$api.get(`/user/like/${id}`, {withCredentials: true});
+
+                if (res.data.success) {
+                    this.$store.commit('SET_USER', {...this.$store.state.user, likes: res.data.likes})
+                    console.log(id)
+
+                    console.log(this.$store.state.user.likes.includes(id.toString()))
+                }
+                else {
+                    alert('Server error.')
+                }
+			} catch (ex) {
+                alert('Server error.')
+				console.log(ex)
+			}  
         },
 
         draggedLeft() {
@@ -116,20 +105,14 @@ export default {
             }, 300);
         },
 
-        draggedRight() {
+        draggedRight(id) {
             setTimeout(() => this.isVisible = false, 200);
             setTimeout(() => {
                 this.index++;
                 this.isVisible = true;
             }, 300);
-        },
 
-        draggedUp() {
-            setTimeout(() => this.isVisible = false, 200);
-            setTimeout(() => {
-                this.index++;
-                this.isVisible = true;
-            }, 300);
+            this.like(id)
         },
 
         hideCard() {
@@ -154,10 +137,28 @@ export default {
 
         dragUp() {
           InteractEventBus.$emit(INTERACT_DRAGGED_UP);
+        },
+        async fetchCards() {
+            try {
+                let res = await this.$api.get('/user/cards', {withCredentials: true});
+                console.log(res.data)
+
+                if (res.data.success && res.data.sortedUsers) {
+                    this.cards = res.data.sortedUsers
+                }
+            }
+            catch (err) {
+                console.error(err)
+            }
         }
     },
-    mounted(){
-
+    created() {
+        if (!this.$store.state.user) {
+            this.$router.push('/login')
+        }
+    },
+    mounted (){
+        this.fetchCards()
     }
 }
 

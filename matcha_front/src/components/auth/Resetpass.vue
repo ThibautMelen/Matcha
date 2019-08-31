@@ -31,6 +31,11 @@ export default {
             email:''
         }
     },
+    created() {
+        if (this.$store.state.user) {
+            this.$router.push('/')
+        }
+    },
     components: {
     },
     methods:{

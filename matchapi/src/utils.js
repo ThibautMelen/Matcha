@@ -130,8 +130,8 @@ async function validator(field, options = {}) {
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: 'test.dev.basilic@gmail.com',
-        pass: '&ngland12345SOFIAN'
+        user: 'matcha42xn@gmail.com',
+        pass: '&R7c%q(piSqd8q*xqb<*'
     }
 })
 

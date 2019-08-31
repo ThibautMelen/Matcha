@@ -7,11 +7,12 @@
                 <!-- Like user -->
                 <button v-if="this.$store.state.user.likes && this.$store.state.user.likes.includes(userinfo.id.toString())" @click="likeRemove(userinfo.id)" style="background-color: #ed5673">Remove Like</button>
                 <button v-else-if="userinfo.likes && userinfo.likes.includes(this.$store.state.user.id.toString())" @click="like(userinfo.id)" style="background-color: #f368e0">Like back</button>
-                <button v-else-if="!userinfo.likes || !userinfo.likes.includes(this.$store.state.user.id)" @click="like(userinfo.id)" style="background-color: #10ac84">Like</button>
+                <button v-else-if="!userinfo.likes || !userinfo.likes.includes(this.$store.state.user.id.toString())" @click="like(userinfo.id)" style="background-color: #10ac84">Like</button>
                 <!-- Block user -->
-                <button v-if="true" @click="blockUser(userinfo.id)" style="background-color: #FD7272">Block User</button>
+                <button v-if="!this.$store.state.user.blocks || !this.$store.state.user.blocks.includes(userinfo.id.toString())" @click="blockUser(userinfo.id)" style="background-color: #FD7272">Block User</button>
+                <span v-else @click="blockUser(userinfo.id)" >User blocked</span>
                 <!-- Report user -->
-                <button v-if="true" @click="reportUser(userinfo.id)" style="background-color: #FD7272">Report User</button>
+                <button v-if="true" @click="reportUser(userinfo.email)" style="background-color: #FD7272">Report User</button>
             </div>
         </div>
 
@@ -115,35 +116,15 @@ export default {
         async blockUser(id) {
             console.log('blockuser()', id);
 
-            // try {
-            //     const res = await this.$api.get(`/user/like/${id}`, {withCredentials: true});
-
-            //     if (res.data.success) {
-            //         this.$store.commit('SET_USER', {...this.$store.state.user, likes: res.data.likes})
-            //         console.log(id)
-
-            //         console.log(this.$store.state.user.likes.includes(id.toString()))
-            //     }
-            //     else {
-            //         alert('Server error.')
-            //     }
-            // } catch (ex) {
-            //     alert('Server error.')
-            //     console.log(ex)
-            // }  
-        },
-        //REPORT USER
-        async reportUser(id) {
-            console.log('reportuser()', id);
-
             try {
-                const res = await this.$api.get(`/user/like/${id}`, {withCredentials: true});
+                const res = await this.$api.get(`/user/block/${id}`, {withCredentials: true});
+                console.log(res.data)
 
                 if (res.data.success) {
-                    this.$store.commit('SET_USER', {...this.$store.state.user, likes: res.data.likes})
+                    this.$store.commit('SET_USER', {...this.$store.state.user, blocks: res.data.blocks})
                     console.log(id)
 
-                    console.log(this.$store.state.user.likes.includes(id.toString()))
+                    console.log(this.$store.state.user.blocks.includes(id.toString()))
                 }
                 else {
                     alert('Server error.')
@@ -153,6 +134,29 @@ export default {
                 console.log(ex)
             }  
         },
+        //REPORT USER
+        async reportUser(email) {
+            console.log('reportuser()', email);
+
+            try {
+                const res = await this.$api.get(`/user/report/${email}`, {withCredentials: true});
+
+                if (res.data.success) {
+                    console.log(email)
+                }
+                else {
+                    alert('Server error.')
+                }
+            } catch (ex) {
+                alert('Server error.')
+                console.log(ex)
+            }  
+        },
+    },
+    created() {
+        if (!this.$store.state.user) {
+            this.$router.push('/login')
+        }
     },
 	mounted(){
         this.fetchSglUsers(this.$route.params.id);

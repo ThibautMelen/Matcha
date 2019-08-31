@@ -87,6 +87,10 @@ export default {
     newMessage: function (newValue, oldValue) {
       this.pushToFeed(newValue)
       scrollToBottom()
+    },
+    initialFeed: function (newValue, oldValue) {
+      this.feed = newValue
+      scrollToBottom()
     }
   },
   mounted () {
@@ -103,6 +107,7 @@ export default {
       this.feed = this.initialFeed
       this.authorId = this.initialAuthorId
     }
+    scrollToBottom()
   },
   methods: {
     setEmojiPickerToggle (toggle) {

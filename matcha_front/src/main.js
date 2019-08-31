@@ -43,8 +43,9 @@ new Vue({
       axios.get('http://localhost:3000/auth/verify', {withCredentials: true})
       .then(res => {
         if (res.data.userInfos) {
+          console.log(res)
           store.commit('SET_USER', res.data.userInfos)
-          store.commit('SET_MATCHES'. res.data.matches)
+          store.commit('SET_MATCHES', res.data.matches)
           store.commit('SET_LOADING', false)
         }
         else {
@@ -75,6 +76,10 @@ new Vue({
         position: "top-right", 
         duration : 5000
      })
+    })
+
+    socket.on('message', (message) => {
+      store.commit('ADD_MESSAGE', message)
     })
 
     store.commit('SET_SOCKET', socket)

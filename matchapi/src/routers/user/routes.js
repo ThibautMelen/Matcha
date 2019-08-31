@@ -23,14 +23,14 @@ module.exports = () => {
     // Select all interests
     router.get('/interests', methods.interests);
 
-    // Select ONE users
-    router.get('/:id', methods.getOne);
-
     // Upload image
     router.post('/image', upload.single('file'), methods.image);
 
     // Like a user
     router.get('/like/:id', auth, methods.like)
+
+    // Like a user
+    router.get('/block/:id', auth, methods.block)
 
     // Unlike a user
     router.get('/unlike/:id', auth, methods.unlike)
@@ -40,6 +40,18 @@ module.exports = () => {
 
     // Unlike a user
     router.post('/search', auth, methods.search)
+
+    // Send a message
+    router.post('/message', auth, methods.message)
+
+    // Get match cards
+    router.get('/cards', auth, methods.cards);
+
+    // Report user
+    router.get('/report/:email', methods.report);
+
+    // Select ONE users
+    router.get('/:id', methods.getOne);
 
     return router;
 };

@@ -141,6 +141,37 @@ module.exports = {
         }
     },
 
+    block: async (req, res) => {
+        if (!req.user) {
+            return res.status(400).json({success: false})
+        }
+
+        try {
+            const user = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users WHERE id = ?', req.user.id)
+            
+            let blocks = []
+
+            if (user[0].blocks) {
+                blocks = user[0].blocks.split(',')
+            }
+
+            if (blocks.indexOf(req.params.id) < 0) {
+                blocks.push(req.params.id)
+            }
+
+            blocks = blocks.join(',')
+
+            await util.promisify(req.db.query).bind(req.db)('UPDATE users SET blocks = ? WHERE id = ?', [blocks, req.user.id]);
+
+            console.log(blocks)
+            res.status(200).json({success: true, blocks: blocks.split(',')})
+
+        } catch (err) {
+            console.error(err)
+            return res.status(203).json({success: false})
+        }
+    },
+
     unlike: async (req, res) => {
         if (!req.user) {
             return res.status(400).json({success: false})
@@ -257,6 +288,9 @@ module.exports = {
             let users = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users');
 
             let filteredUsers = users.filter((v) => {
+                if (current_user[0].blocks && current_user[0].blocks.includes(v.id.toString())) {
+                    return false
+                }
                 if (req.body.search) {
                     if (!(v.username && v.username.match(new RegExp(req.body.search, 'i'))) && !(v.bio && v.bio.match(new RegExp(req.body.search, 'i')))) {
                         return false
@@ -274,7 +308,6 @@ module.exports = {
                     }
                 }
                 if (req.body.kmRange && req.body.kmRange < 100) {
-                    console.log('yo')
                     let dist = getDistanceFromLatLonInKm(parseFloat(current_user[0].lat), parseFloat(current_user[0].lng), parseFloat(v.lat), parseFloat(v.lng))
                     console.log(`${dist} > ${req.body.kmRange}`)
 
@@ -308,6 +341,131 @@ module.exports = {
         } catch (err) {
             console.error(err)
             return res.status(203).json({success: false})
+        }
+    },
+
+    message: async (req, res) => {
+        if (!req.user || !req.body) {
+            return res.status(400).json({success: false})
+        }
+
+        try {
+            const user = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users WHERE id = ?', req.user.id)
+
+            let messageUser = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users WHERE id = ?', req.body.receiverId);
+
+            if (messageUser[0] && messageUser[0].sid) {
+                let messageUserSocket = req.io.sockets.connected[messageUser[0].sid]
+
+                if (messageUserSocket) {
+                    let notifText = `${user[0].username} sent you a message !`
+
+                    messageUserSocket.emit('notification', notifText)
+                    messageUserSocket.emit('message', {
+                        id: user[0].id,
+                        contents: req.body.message,
+                        date: `${new Date().getHours()}:${new Date().getMinutes()}`
+                    })
+                }
+            }
+
+            res.status(200).json({success: true})
+        }
+        catch (err) {
+            console.error(err)
+            return res.status(203).json({success: false})
+        }
+    },
+
+    cards: async (req, res) => {
+        if (!req.user) {
+            return res.status(400).json({success: false})
+        }
+
+        try {
+            const deg2rad = (deg) => {
+                return deg * (Math.PI/180)
+            }
+
+            const getDistanceFromLatLonInKm = (lat1,lon1,lat2,lon2) => {
+
+                var R = 6371;
+                var dLat = deg2rad(lat2-lat1);
+                var dLon = deg2rad(lon2-lon1);
+                var a = 
+                Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+                Math.sin(dLon/2) * Math.sin(dLon/2)
+                ; 
+                var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+                var d = R * c;
+                return d;
+            }
+
+            let current_user = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users WHERE id = ?', req.user.id)
+
+            let users = await util.promisify(req.db.query).bind(req.db)('SELECT * FROM users')
+            
+            let sortedUsers = users.filter(v => {
+                if (v.id === current_user[0].id) {
+                    return false
+                }
+                let curr_sex_or = current_user[0].sexual_orientations.split(',')
+                let sex_or = v.sexual_orientations.split(',')
+
+                let curr_likes = current_user[0].likes ? current_user[0].likes.split(',') : []
+                let curr_blocks = current_user[0].blocks ? current_user[0].blocks.split(',') : []
+
+                if (curr_sex_or.includes(v.type) && sex_or.includes(current_user[0].type) && !curr_likes.includes(v.id.toString()) && !curr_blocks.includes(v.id.toString())) {
+                    return true
+                }
+                return false
+            })
+
+            sortedUsers.sort((a, b) => {
+                let distA = getDistanceFromLatLonInKm(parseFloat(current_user[0].lat), parseFloat(current_user[0].lng), parseFloat(a.lat), parseFloat(a.lng))
+                let distB = getDistanceFromLatLonInKm(parseFloat(current_user[0].lat), parseFloat(current_user[0].lng), parseFloat(b.lat), parseFloat(b.lng))
+                if (distB < distA) {
+                    return -1
+                }
+                if (current_user[0].interests.split(',').filter(value => b.interests.split(',').includes(value)) > current_user[0].interests.split(',').filter(value => a.interests.split(',').includes(value))) {
+                    return -1
+                }
+                if (Math.abs(current_user[0].age - b.age) < Math.abs(current_user[0].age - a.age)) {
+                    return -1
+                }
+                if (b.fame > a.fame) {
+                    return -1
+                }
+                return 0
+            })
+
+
+            return res.status(200).json({success: true, sortedUsers})
+        } catch (err) {
+            console.error(err)
+            return res.status(203).json({success: false})
+        }
+    },
+
+    report: async (req, res) => {
+
+        //Send verification emal
+        try {
+            await utils.transporter.sendMail({
+                from: 'Matcha <matcha42xn@gmail.com>',
+                to: req.params.email,
+                subject: 'Report user',
+                text: `
+                ID : ${req.params.email}.
+                `
+            })
+            console.log(`Mail sent to ${req.params.email}`)
+            res.status(200).json({success: true})
+        }
+        catch(err) {
+            console.error('Mail error :', err)
+            res.status(203).json({success: false})
         }
     }
 }

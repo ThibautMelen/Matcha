@@ -174,6 +174,11 @@ export default {
             uploading_image: false,
         }
     },
+    created() {
+        if (this.$store.state.user) {
+            this.$router.push('/')
+        }
+    },
     components: {
         VueTagsInput,
         VueUploadMultipleImage

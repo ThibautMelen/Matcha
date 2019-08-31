@@ -51,6 +51,11 @@ export default {
             users: []
         }
     },
+    created() {
+        if (this.$store.state.user) {
+            this.$router.push('/')
+        }
+    },
     methods:{
         //LOGIN FORM
         async login () {

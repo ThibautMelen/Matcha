@@ -17,7 +17,7 @@ const store = new Vuex.Store({
         SET_USER (state, user) {
             state.user = user
         },
-        SET_MATCHES (state, user) {
+        SET_MATCHES (state, matches) {
             state.matches = matches
         },
         SET_LOADING (state, loading) {
@@ -35,6 +35,13 @@ const store = new Vuex.Store({
         },
         REMOVE_NOTIF (state, index) {
             state.notifs.splice(index, 1)
+        },
+        ADD_MESSAGE (state, message) {
+            let matchIndex = state.matches.findIndex(v => v.id === message.id)
+
+            if (matchIndex >= 0) {
+                state.matches[matchIndex].feed.push(message)
+            }
         }
     }
 })

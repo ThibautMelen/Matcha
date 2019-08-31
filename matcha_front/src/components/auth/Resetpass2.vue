@@ -32,6 +32,11 @@ export default {
             password: ''
         }
     },
+    created() {
+        if (this.$store.state.user) {
+            this.$router.push('/')
+        }
+    },
     components: {
     },
     methods:{

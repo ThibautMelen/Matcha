@@ -21,6 +21,11 @@ export default {
             variable: false
         }
     },
+    created() {
+        if (!this.$store.state.user) {
+            this.$router.push('/login')
+        }
+    },
     methods:{
         delNotif(notifIndex) {
             this.$store.commit('REMOVE_NOTIF', notifIndex);
