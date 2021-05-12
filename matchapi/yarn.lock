@@ -818,6 +818,11 @@ extglob@^2.0.4:
     snapdragon "^0.8.1"
     to-regex "^3.0.1"
 
+faker@^4.1.0:
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/faker/-/faker-4.1.0.tgz#1e45bbbecc6774b3c195fad2835109c6d748cc3f"
+  integrity sha1-HkW7vsxndLPBlfrSg1EJxtdIzD8=
+
 fill-range@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/fill-range/-/fill-range-4.0.0.tgz#d544811d428f98eb06a63dc402d2403c328c38f7"
@@ -1617,10 +1622,10 @@ node-pre-gyp@0.12.0, node-pre-gyp@^0.12.0:
     semver "^5.3.0"
     tar "^4"
 
-nodemailer@^6.3.0:
-  version "6.3.0"
-  resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-6.3.0.tgz#a89b0c62d3937bdcdeecbf55687bd7911b627e12"
-  integrity sha512-TEHBNBPHv7Ie/0o3HXnb7xrPSSQmH1dXwQKRaMKDBGt/ZN54lvDVujP6hKkO/vjkIYL9rK8kHSG11+G42Nhxuw==
+nodemailer@^6.4.16:
+  version "6.4.16"
+  resolved "https://registry.yarnpkg.com/nodemailer/-/nodemailer-6.4.16.tgz#5cb6391b1d79ab7eff32d6f9f48366b5a7117293"
+  integrity sha512-68K0LgZ6hmZ7PVmwL78gzNdjpj5viqBdFqKrTtr9bZbJYj6BRj5W6WGkxXrEnUl3Co3CBXi3CZBUlpV/foGnOQ==
 
 nodemon@^1.19.1:
   version "1.19.1"
